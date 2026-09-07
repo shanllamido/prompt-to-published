@@ -1,5 +1,8 @@
 # Prompt to Published
 
+**Live:** <https://prompt-to-published.vercel.app>
+**Source:** <https://github.com/shanllamido/prompt-to-published>
+
 A single-page work sample for the **Product Manager, AI Department** role (AI website builder).
 It does two things on one page:
 

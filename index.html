@@ -443,6 +443,34 @@ em{font-style:italic}
   border-radius:5px;padding:.3rem .55rem;color:var(--soft-ink);
 }
 
+/* execution / decisions */
+.decisions{margin-top:2.2rem;display:flex;flex-direction:column;gap:1rem}
+.decision{border:1px solid var(--hairline);border-radius:var(--radius);background:var(--surface);padding:1.4rem}
+.decision-num{font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-2);display:block;margin-bottom:.4rem}
+.decision h3{font-size:1.1rem;margin:0 0 1rem;max-width:40ch}
+.opt-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.opt{
+  font-family:var(--font-mono);font-size:.72rem;text-align:left;
+  background:var(--bg);border:1px solid var(--hairline);color:var(--soft-ink);
+  border-radius:7px;padding:.5rem .75rem;cursor:pointer;
+  transition:border-color .15s,color .15s,background .15s;
+}
+.opt:hover{color:var(--ink);border-color:var(--soft-ink)}
+.opt[aria-selected="true"]{background:var(--surface);border-color:var(--accent-2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent-2)}
+.opt .pick{margin-left:.5rem;color:var(--accent);font-weight:600}
+.decision-detail{
+  border-left:2px solid var(--accent-2);
+  padding:.1rem 0 .1rem 1rem;margin:0 0 1.15rem;
+  font-size:.94rem;color:var(--soft-ink);min-height:2.5em;
+}
+.decision-detail strong{color:var(--ink);font-weight:600}
+.decision-call{background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:.85rem 1rem;margin-bottom:1.1rem}
+.decision-foot{display:grid;grid-template-columns:1fr 1fr;gap:1rem 1.5rem}
+@media (max-width:640px){ .decision-foot{grid-template-columns:1fr} }
+.decision .dl{font-family:var(--font-mono);font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--soft-ink);display:block;margin-bottom:.3rem}
+.decision-call p{margin:0;font-size:.93rem;color:var(--ink)}
+.decision-foot p{margin:0;font-size:.9rem;color:var(--soft-ink)}
+
 /* KPI grid */
 .kpi-note{
   font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink);
@@ -543,6 +571,7 @@ footer.disc p{font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink
       <a href="#demo">Demo</a>
       <a href="#approach">Approach</a>
       <a href="#roadmap">Roadmap</a>
+      <a href="#execution">Execution</a>
       <a href="#metrics">Metrics</a>
       <a href="#landscape">Landscape</a>
       <a href="#contact">Contact</a>
@@ -554,6 +583,7 @@ footer.disc p{font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink
   <a href="#demo" data-dot="demo"><span>Demo</span></a>
   <a href="#approach" data-dot="approach"><span>Approach</span></a>
   <a href="#roadmap" data-dot="roadmap"><span>Roadmap</span></a>
+  <a href="#execution" data-dot="execution"><span>Execution</span></a>
   <a href="#metrics" data-dot="metrics"><span>Metrics</span></a>
   <a href="#landscape" data-dot="landscape"><span>Landscape</span></a>
   <a href="#contact" data-dot="contact"><span>Contact</span></a>
@@ -685,21 +715,21 @@ footer.disc p{font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink
       <span class="n">01</span>
       <div>
         <h3>Speed earns the first look. Quality earns the domain purchase.</h3>
-        <p>A fast generation gets someone to stay for thirty seconds. Whether they buy a custom domain depends on whether the draft holds up to a careful read. Optimize the whole funnel, not the first screen.</p>
+        <p>A fast generation buys thirty seconds of attention. The domain purchase depends on whether the draft survives a careful read — so optimize the whole funnel, not the first screen.</p>
       </div>
     </div>
     <div class="principle">
       <span class="n">02</span>
       <div>
         <h3>Regenerating a section should never feel like starting over.</h3>
-        <p>Section-level control, not full-layout reshuffles. If changing the hero headline also moves the pricing table, people stop trusting the regenerate button — and the regenerate button is the product.</p>
+        <p>Section-level control, not full-layout reshuffles. If editing the hero also shifts the pricing table, people stop trusting the regenerate button — and that button is the product.</p>
       </div>
     </div>
     <div class="principle">
       <span class="n">03</span>
       <div>
         <h3>AI confidence should never outrun AI accuracy.</h3>
-        <p>Factual fields — hours, pricing, credentials, claims — need a visible review-before-publish state. Confident, wrong, and public is the failure mode that costs a real business a real customer.</p>
+        <p>Factual fields — hours, pricing, credentials — need a visible review-before-publish state. Confident, wrong, and public is the failure that costs a real business a real customer.</p>
         <span class="demo-note">The workbench above demonstrates this: every draft carries a review-before-publishing badge.</span>
       </div>
     </div>
@@ -707,7 +737,7 @@ footer.disc p{font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink
       <span class="n">04</span>
       <div>
         <h3>Great defaults, real editing underneath.</h3>
-        <p>The generated page should be good enough to ship untouched — and every part of it should be directly editable when someone wants to. Defaults are a starting point, never a cage.</p>
+        <p>The generated page should be good enough to ship untouched — and every part of it editable when someone wants to. Defaults are a starting point, never a cage.</p>
       </div>
     </div>
   </div>
@@ -762,6 +792,16 @@ footer.disc p{font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink
       </div>
     </div>
   </div>
+</section>
+
+<hr class="rule" />
+
+<!-- EXECUTION / DECISIONS -->
+<section class="section" id="execution">
+  <span class="eyebrow">How I'd run it</span>
+  <h2>The decisions I see coming — and how I'd <span class="i">approach</span> them.</h2>
+  <p class="section-lead">Four forks the PM of this team hits in the first two quarters. For each one: the options on the table, where I'd land and why, how we'd know it's working, and what would make me reverse it. Click any option to compare.</p>
+  <div class="decisions" id="decisions"></div>
 </section>
 
 <hr class="rule" />
@@ -1265,7 +1305,7 @@ footer.disc p{font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink
   /* ---------- nav active state ---------- */
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('.topnav a'));
   var dotLinks = Array.prototype.slice.call(document.querySelectorAll('.dotnav a'));
-  var navIds = ['demo','approach','roadmap','metrics','landscape','contact'];
+  var navIds = ['demo','approach','roadmap','execution','metrics','landscape','contact'];
   if('IntersectionObserver' in window){
     var byId = {};
     navIds.forEach(function(id){ var el = document.getElementById(id); if(el) byId[id]=el; });
@@ -1279,6 +1319,99 @@ footer.disc p{font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink
       });
     }, { rootMargin:'-45% 0px -50% 0px', threshold:0 });
     Object.keys(byId).forEach(function(id){ io.observe(byId[id]); });
+  }
+
+  /* ---------- execution decision cards ---------- */
+  var DECISIONS = [
+    {
+      num:'01',
+      q:'How much of the model do we build ourselves?',
+      pick:2,
+      options:[
+        {label:'Wrap a frontier API', body:'Ships the loop in weeks and gives us the best raw quality available today. The cost is a per-generation price we don’t control and a quality ceiling that moves when someone else’s roadmap moves.'},
+        {label:'Fine-tune an open model', body:'Predictable cost, full control, our data stays ours. But it means standing up an ML training and serving operation before we’ve proven anyone wants the product.'},
+        {label:'Blend the two', body:'Frontier model for the creative draft, where quality is visible; small fine-tuned models for the high-volume mechanical work — layout selection, SEO fields, single-section rewrites.'}
+      ],
+      land:'Start by wrapping a frontier API — the first job is learning what “good” output sounds like, and that needs real users. As the mechanical tasks settle into patterns, move them to small models one at a time. Train nothing until the loop has traction.',
+      validate:'Cost per published site, plus a monthly blind test where the team ranks our output against a fixed frontier baseline. Healthy = quality holds while cost per site trends down.',
+      flip:'If cost per published site won’t clear the free-tier math at scale, or a provider change degrades output we can’t route around — that’s when the open-model investment gets funded.'
+    },
+    {
+      num:'02',
+      q:'What does the editor actually let people do?',
+      pick:2,
+      options:[
+        {label:'Freeform canvas', body:'Highest ceiling, and what the Independent Creator wants. Also a multi-quarter build — and freeform editing of an AI-generated layout is exactly where most of these products feel broken.'},
+        {label:'Fork an open-source builder', body:'The editing problem is mostly solved for free. But we inherit its data model and its UX, and bending someone else’s builder toward AI-native tends to cost more than it saves.'},
+        {label:'Constrained section slots', body:'The page is a stack of typed sections. You can edit content, swap a section’s variant, reorder, or regenerate one section — no absolute positioning.'}
+      ],
+      land:'Constrained slots — not as a compromise, but because it’s the thing that makes regeneration safe. If every section is a defined slot, “regenerate this” can’t break the rest of the page. Freeform is a later conversation, and only if creators ask for it with their feet.',
+      validate:'Edit-to-publish ratio — are people shipping without a fight? — and 4-week retention of the Independent Creator segment specifically.',
+      flip:'If creators consistently churn citing “I can’t make it mine,” add a freeform escape hatch for individual sections — not a full rebuild.'
+    },
+    {
+      num:'03',
+      q:'How does a page actually get generated?',
+      pick:1,
+      options:[
+        {label:'One-shot', body:'Prompt in, whole page out in a single call. Feels magic, lowest latency. But regenerating means re-rolling the whole page, and we can’t explain why it chose what it chose.'},
+        {label:'Plan-then-fill', body:'The model drafts a structure first — which sections, in what order, saying what — then fills each section as its own step.'}
+      ],
+      land:'Plan-then-fill. Slightly slower and a bit more to build, but section-level regeneration, undo, and “why is this section here” all fall out of having an explicit plan. One-shot paints us into a corner the moment someone wants to change one thing.',
+      validate:'Regeneration rate (target under 20%) and post-regenerate undo rate — if people regenerate then immediately undo, the fill step isn’t good enough.',
+      flip:'If first-generation latency can’t feel live, pre-warm the plan and cache aggressively — don’t retreat to one-shot.'
+    },
+    {
+      num:'04',
+      q:'How do we spend Phase 0?',
+      pick:1,
+      options:[
+        {label:'Build wide', body:'Four or five industry templates working roughly, to show range early. Spreads a small team thin and makes the quality bar negotiable.'},
+        {label:'Build one deep', body:'One template family, polished until the output quality genuinely holds. Publish rate is the only number that matters.'},
+        {label:'Instrument first', body:'Week one goes entirely to telemetry and the quality-review process before we generate anything real.'}
+      ],
+      land:'One deep, with a slice of “instrument first” up front. One pod — a designer, two engineers, an applied-AI person, me — on a single family for six weeks. Week one stands up telemetry and a standing Friday review where the team reads real output aloud. No second template until publish rate is real and the Friday review stops finding tone problems.',
+      validate:'Publish rate on the one family, and whether the Friday review’s finding count is trending toward zero.',
+      flip:'If one family can’t hit a quality bar we’d sign our names to in six weeks, the problem is upstream — model or generation approach — and we fix that before adding surface area.'
+    }
+  ];
+  var decisionsWrap = document.getElementById('decisions');
+  if(decisionsWrap){
+    DECISIONS.forEach(function(d){
+      var card = document.createElement('article');
+      card.className = 'decision';
+      card.innerHTML =
+        '<span class="decision-num">Decision ' + d.num + '</span>' +
+        '<h3>' + esc(d.q) + '</h3>' +
+        '<div class="opt-row" role="tablist" aria-label="Options for decision ' + d.num + '">' +
+          d.options.map(function(o, oi){
+            return '<button class="opt" type="button" role="tab" aria-selected="false" data-oi="' + oi + '">' +
+              esc(o.label) + (oi === d.pick ? ' <span class="pick">◆ my call</span>' : '') + '</button>';
+          }).join('') +
+        '</div>' +
+        '<p class="decision-detail" data-detail></p>' +
+        '<div class="decision-call"><span class="dl">Where I’d land</span><p>' + esc(d.land) + '</p></div>' +
+        '<div class="decision-foot">' +
+          '<div><span class="dl">How we’d know it’s working</span><p>' + esc(d.validate) + '</p></div>' +
+          '<div><span class="dl">What would flip it</span><p>' + esc(d.flip) + '</p></div>' +
+        '</div>';
+      decisionsWrap.appendChild(card);
+
+      var detail = card.querySelector('[data-detail]');
+      var opts = Array.prototype.slice.call(card.querySelectorAll('.opt'));
+      function select(oi){
+        opts.forEach(function(b, bi){ b.setAttribute('aria-selected', bi === oi ? 'true' : 'false'); });
+        detail.innerHTML = '<strong>' + esc(d.options[oi].label) + '.</strong> ' + esc(d.options[oi].body);
+      }
+      opts.forEach(function(b, bi){
+        b.addEventListener('click', function(){ select(bi); });
+        b.addEventListener('keydown', function(e){
+          var dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+          if(dir){ e.preventDefault(); var t = (bi + dir + opts.length) % opts.length; opts[t].focus(); select(t); }
+        });
+      });
+      select(d.pick);
+    });
   }
 
   /* ---------- init ---------- */

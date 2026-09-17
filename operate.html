@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How I Operate</title>
+<meta name="description" content="Six operating principles, each with proof already on this site, plus how they'd apply in the first weeks at IONOS. By Shanelle Llamido, for the Product Manager, AI App & Sitebuilder role." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="style.css" />
+<style>
+.principles{display:flex;flex-direction:column;gap:1rem;margin:1.8rem 0}
+.principle{padding:1.3rem 1.4rem}
+.principle .pn{
+  font-family:var(--font-mono);font-size:.7rem;color:var(--soft-ink);
+  display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;
+}
+.principle .pn .dot{width:6px;height:6px;border-radius:50%;background:var(--gradient);flex:0 0 auto}
+.principle h3{font-size:1.05rem;margin:0 0 .4rem}
+.principle p{margin:0 0 .7rem;color:var(--soft-ink);font-size:.93rem}
+.proof{
+  display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-mono);font-size:.7rem;
+  color:var(--violet);text-decoration:none;
+}
+.proof:hover{text-decoration:underline}
+
+.weeks{display:flex;flex-direction:column;gap:.8rem;margin:1.6rem 0}
+.week-row{display:grid;grid-template-columns:2.4rem 1fr;gap:1rem;padding:1.05rem 1.3rem}
+.week-row .wn{
+  width:2.2rem;height:2.2rem;border-radius:50%;background:var(--glass-strong);border:1px solid var(--glass-border);
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.85rem;font-weight:600;color:var(--violet);
+}
+.week-row p{margin:0;font-size:.92rem;color:var(--soft-ink)}
+.week-row b{color:var(--ink)}
+
+.closing p{max-width:62ch;color:var(--soft-ink);font-size:1.02rem}
+.contact{padding:1.6rem 1.5rem;margin-top:1.4rem}
+.contact .who{font-family:var(--font-display);font-size:1.3rem;font-weight:800}
+.contact .re{font-family:var(--font-mono);font-size:.76rem;color:var(--soft-ink);margin:.35rem 0 1.1rem}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html"><span class="dot"></span><span class="full">Cost Per Generation</span></a>
+    <nav class="navlinks">
+      <a href="index.html">Research</a>
+      <a href="workflow.html">How it's built</a>
+      <a href="operate.html" class="is-active">How I operate</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <span class="eyebrow">About the PM</span>
+    <h1>How I operate</h1>
+    <p class="lede">Product management is mostly judgment under uncertainty, made visible to other people. Here are six things I actually work by — each one has proof on this site already, not just a claim here.</p>
+  </div>
+
+  <!-- PRINCIPLES -->
+  <section style="margin-top:3rem" id="principles">
+    <div class="wrap">
+      <div class="principles">
+        <div class="principle card">
+          <div class="pn"><span class="dot"></span>01</div>
+          <h3>Ship the argument, not the deck</h3>
+          <p>A memo says I understand the problem. A working demo, a real cost table, a stack I'd defend out loud — that's what actually shows how I think. Asked to demonstrate product thinking, my instinct is to build the thing, not describe it.</p>
+          <a class="proof" href="index.html">→ this whole site is the answer</a>
+        </div>
+        <div class="principle card">
+          <div class="pn"><span class="dot"></span>02</div>
+          <h3>Make the tradeoff visible, not just the decision</h3>
+          <p>Every real call has a reason it could go the other way. I write that down on purpose — not to hedge, but so the decision can be argued with and reversed cleanly if the facts change.</p>
+          <a class="proof" href="workflow.html#stack">→ the stack review states what would flip each call</a>
+        </div>
+        <div class="principle card">
+          <div class="pn"><span class="dot"></span>03</div>
+          <h3>Name the missing piece, not just react to what's given</h3>
+          <p>Handed a stack, a plan, or a brief, I look for what's quietly assumed rather than only grading what's already there. The gap is usually more important than the parts someone remembered to mention.</p>
+          <a class="proof" href="workflow.html#stack">→ flagging AI orchestration and UI/UX design, unprompted</a>
+        </div>
+        <div class="principle card">
+          <div class="pn"><span class="dot"></span>04</div>
+          <h3>Talk numbers fluently, not directionally</h3>
+          <p>"Make it cheaper" isn't a plan. Cost per token, per call, per feature, priced against real published rates — that's a plan, and it's the only version a finance conversation can actually use.</p>
+          <a class="proof" href="workflow.html#estimator">→ the cost estimator runs real pricing, not vibes</a>
+        </div>
+        <div class="principle card">
+          <div class="pn"><span class="dot"></span>05</div>
+          <h3>Find the real leverage, not the obvious lever</h3>
+          <p>"Be better than the competitor" isn't a strategy. Naming the specific weakness — credit opacity, a hard complexity ceiling — and building the one feature that targets it directly, is.</p>
+          <a class="proof" href="index.html#top">→ the Lovable leverage points, each aimed at one named weakness</a>
+        </div>
+        <div class="principle card">
+          <div class="pn"><span class="dot"></span>06</div>
+          <h3>Default to building, not asking</h3>
+          <p>Given an open question, I'd rather go find a defensible answer and bring back something concrete than hand back a list of things I'd need from someone else first.</p>
+          <a class="proof" href="operate.html">→ this page exists because that's the default</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- FIRST WEEKS -->
+  <section id="first-weeks">
+    <div class="wrap" style="max-width:740px">
+      <span class="eyebrow">Applied to this role</span>
+      <h2>What I'd actually do in the first few weeks at IONOS</h2>
+    </div>
+    <div class="wrap">
+      <div class="weeks">
+        <div class="week-row card">
+          <span class="wn">1</span>
+          <p><b>Sit with Customer Care before writing a roadmap line.</b> The real sameness-and-trust problems show up in support tickets first, not in a brainstorm — I'd rather start from what's already going wrong for a real customer.</p>
+        </div>
+        <div class="week-row card">
+          <span class="wn">2</span>
+          <p><b>Get the token-economics math into a shared model, in writing, in week one.</b> Nobody should be pricing a plan tier by intuition when the product's core cost driver is this measurable — the table on this site is the shape of it.</p>
+        </div>
+        <div class="week-row card">
+          <span class="wn">3</span>
+          <p><b>Pick one number to instrument before touching the roadmap.</b> Probably publish rate or edit-to-publish ratio — so "working" has a figure attached to it from day one, not just a feeling by week eight.</p>
+        </div>
+        <div class="week-row card">
+          <span class="wn">4</span>
+          <p><b>Name the AI-orchestration owner explicitly — even if that's me, for now.</b> The piece most likely to end up silently unowned is the piece the entire product depends on. I'd rather say that plainly than assume someone has it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- CLOSING -->
+  <section class="closing" id="contact">
+    <div class="wrap" style="max-width:740px">
+      <span class="eyebrow">Closing note</span>
+      <h2>Why a build, not just an application</h2>
+      <p>Anyone can say they'd be effective. I'd rather leave something you can click through, argue with, and check my math on — a research brief, a stack I'd defend, a tool that prices its own claims. If any of it is wrong, I'd genuinely like to know where — that's the same standard I'd hold the product to.</p>
+      <div class="contact card">
+        <div class="who">Shanelle Llamido</div>
+        <div class="re">Re: Product Manager, AI App &amp; Sitebuilder — IONOS Group SE, Karlsruhe (ref. 1579)</div>
+        <a class="btn btn-primary" href="mailto:shanelle.llamido@gmail.com?subject=Product%20Manager%2C%20AI%20App%20%26%20Sitebuilder%20%E2%80%94%20follow-up">Email shanelle.llamido@gmail.com</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -51,6 +51,7 @@
 .verdict.keep{background:rgba(46,158,107,.14);color:var(--good)}
 .verdict.watch{background:rgba(255,138,76,.16);color:var(--coral)}
 .verdict.gap{background:rgba(224,86,63,.14);color:var(--bad)}
+.verdict.priority{background:rgba(140,107,255,.16);color:var(--violet)}
 .stack-detail{padding:0 1.3rem 1rem;margin-top:-.6rem;font-size:.88rem;color:var(--soft-ink)}
 .stack-detail b{color:var(--ink)}
 
@@ -122,6 +123,7 @@
     <nav class="navlinks">
       <a href="index.html">Research</a>
       <a href="workflow.html" class="is-active">How it's built</a>
+      <a href="operate.html">How I operate</a>
     </nav>
   </div>
 </header>
@@ -184,6 +186,13 @@
     </div>
 
     <div class="wrap" style="max-width:740px">
+      <div class="qcallout card">
+        <span class="q">?</span>
+        <p><b>What about existing branding?</b> Two paths, both optional: pick a curated starting point from the design-token library, or upload real brand guidelines — a logo, a palette, a style PDF — and the draft is built to match them instead of overwriting them. Someone with a brand already shouldn't have to fight the generator to keep it.</p>
+      </div>
+    </div>
+
+    <div class="wrap" style="max-width:740px">
       <h3 style="font-size:.95rem;margin:2rem 0 0">What actually gets delivered</h3>
     </div>
     <div class="wrap">
@@ -201,9 +210,9 @@
   <!-- STACK REVIEW -->
   <section id="stack">
     <div class="wrap" style="max-width:740px">
-      <span class="eyebrow">02 — Engineering stack review</span>
-      <h2>A developer's proposed stack — is it right?</h2>
-      <p class="lede">Reviewed layer by layer, now including the design and editing experience the original list left out entirely. Short answer: the backend core is solid and worth keeping — four things are worth adding or pushing on before it's final.</p>
+      <span class="eyebrow">02 — Engineering stack</span>
+      <h2>The stack I'd pick, layer by layer</h2>
+      <p class="lede">Not a reaction to anyone else's list — this is where I'd start, reasoned from what the product actually has to do: generate real UI/UX from a brief, let someone reshape it visually, and stay cheap enough to run at volume.</p>
     </div>
     <div class="wrap">
       <div class="stack-list">
@@ -211,71 +220,71 @@
           <div class="stack-row">
             <span class="layer">Frontend</span>
             <span class="choice">Next.js (App Router) + shadcn/ui + TypeScript</span>
-            <span class="verdict keep">Keep</span>
+            <span class="verdict keep">Foundational</span>
           </div>
-          <div class="stack-detail">Standard, well-supported, fast to build in. Server actions cut boilerplate; shadcn ships accessible components you own (copy-in, not a runtime dependency) instead of a locked-in design system. Right call for a small team moving fast.</div>
+          <div class="stack-detail">Fast to build in, well-supported, and shadcn ships accessible components you own outright (copy-in, not a runtime dependency) instead of a locked-in design system — matters once the product needs its own visual identity on top. Right call for a small team moving fast.</div>
         </div>
         <div class="card">
           <div class="stack-row">
             <span class="layer">Design system / theming</span>
-            <span class="choice">— not specified —</span>
-            <span class="verdict gap">Missing</span>
+            <span class="choice">Versioned design-token library — AI selects and remixes, never invents raw CSS</span>
+            <span class="verdict priority">Design this first</span>
           </div>
-          <div class="stack-detail">This is where "sameness at scale" either gets solved or doesn't. Let the AI invent arbitrary colors and type pairings freely, and output gets inconsistent and sometimes fails contrast — exactly what a pre-publish accessibility audit is supposed to catch after the fact. Better: a versioned library of curated design tokens — palette pairs, type pairings, spacing/radius scales, the same idea the research brief's own category engine uses — that the AI <em>selects and remixes</em> rather than invents from scratch. Every generated site inherits a baseline of taste for free, and the accessibility check becomes a formality instead of a rescue.</div>
+          <div class="stack-detail">This is where "sameness at scale" either gets solved or doesn't. A curated library of palette pairs, type pairings, and spacing/radius scales — the same idea the research brief's own category engine uses — means the AI is choosing and combining from something already good, not inventing colors from scratch and hoping they pass contrast. <b>Brand intake feeds this layer directly:</b> someone picks a curated starting point, or uploads their own guidelines (logo, palette, fonts) and the token set gets built to match instead of overwritten. Every generated site inherits a baseline of taste for free, and the pre-publish accessibility check becomes a formality instead of a rescue.</div>
         </div>
         <div class="card">
           <div class="stack-row">
             <span class="layer">Visual editor (UI/UX)</span>
-            <span class="choice">— not specified —</span>
-            <span class="verdict gap">Missing</span>
+            <span class="choice">Click-to-select + inline edit + properties panel, built on the section-slot model</span>
+            <span class="verdict priority">Design this first</span>
           </div>
-          <div class="stack-detail">Chat-based edits cover content changes. They don't cover "move this," "make this section bigger," "swap this layout variant" — real UI/UX editing needs a visual surface, not just a text box. Build it directly on top of shadcn/ui and the section-slot data model already in the stack — click to select a section, edit text inline, adjust structured properties (variant, spacing, color) in a panel — rather than adopting a third-party page-builder framework. That avoids the exact trap flagged in the Lovable research: inheriting someone else's data model and UX instead of owning your own.</div>
+          <div class="stack-detail">Chat-based edits cover content changes. They don't cover "move this," "make this section bigger," "swap this layout variant" — real UI/UX editing needs a visual surface, not just a text box. I'd build it directly on shadcn/ui and the same structured section data the AI generates — click to select a section, edit text inline, adjust structured properties (variant, spacing, color) in a panel — rather than adopting a third-party page-builder framework and inheriting its data model and UX instead of owning mine.</div>
         </div>
         <div class="card">
           <div class="stack-row">
             <span class="layer">Database + Auth</span>
             <span class="choice">Supabase — Postgres, Auth, RLS for role/portal isolation</span>
-            <span class="verdict keep">Keep</span>
+            <span class="verdict keep">Foundational</span>
           </div>
-          <div class="stack-detail">Enforcing internal/customer/operator isolation at the database layer via RLS is stronger than checking roles only in application code. <b>One caution:</b> RLS policies get harder to reason about as they multiply — keep them simple, test them directly, and don't treat RLS as the only line of defense; validate roles in server actions too.</div>
+          <div class="stack-detail">Enforcing internal/customer/operator isolation at the database layer via RLS is stronger than checking roles only in application code. I'd still validate roles in server actions too — RLS policies get harder to reason about as they multiply, and I don't want it to be the only line of defense.</div>
         </div>
         <div class="card">
           <div class="stack-row">
             <span class="layer">CRUD</span>
             <span class="choice">Direct against Supabase — client + server actions/route handlers, no separate API layer</span>
-            <span class="verdict keep">Keep, with a caveat</span>
+            <span class="verdict watch">Decide deliberately</span>
           </div>
-          <div class="stack-detail">Right-sized for now — a hand-rolled REST/GraphQL layer in front of the database would just be a proxy nobody needed yet. <b>The caveat:</b> this quietly assumes only this Next.js app ever talks to the data. If a mobile app, a partner integration, or a public API shows up later, that's a real retrofit, not a config change — worth deciding now whether that's a permanent bet or a Phase-0 simplification.</div>
+          <div class="stack-detail">Right-sized for now — a hand-rolled REST/GraphQL layer in front of the database would just be a proxy nobody needs yet. The bet I'm making explicit: this only works while this Next.js app is the sole client. The day a mobile app, a partner integration, or a public API shows up, that's a real retrofit, not a config change — I'd treat that as a Phase-0 simplification, not a permanent architecture, and say so out loud.</div>
         </div>
         <div class="card">
           <div class="stack-row">
-            <span class="layer">Background jobs</span>
-            <span class="choice">Separate Dockerized Python server, same Postgres — polling, expiry sweeps, timers</span>
-            <span class="verdict watch">Push back</span>
+            <span class="layer">Background / scheduled jobs</span>
+            <span class="choice">A Node/TypeScript worker (or a managed queue — pg_cron, Trigger.dev, Inngest)</span>
+            <span class="verdict watch">Decide deliberately</span>
           </div>
-          <div class="stack-detail">Pulling long-running/scheduled work out of the request-response cycle is the right instinct — serverless functions aren't built for polling loops. <b>But:</b> a second language and a second deploy pipeline is a real tax on a small team already running TypeScript everywhere else. Worth asking directly: is there a concrete reason for Python here (a library only Python has, existing team depth), or is it default habit? If it's habit, a Node/TypeScript worker — or a managed queue like Supabase's pg_cron, Trigger.dev, or Inngest — gets the same separation without a second runtime to operate.</div>
+          <div class="stack-detail">Pulling long-running/scheduled work out of the request-response cycle is right — serverless functions aren't built for polling loops. I'd default to keeping it in TypeScript rather than standing up a second language and deploy pipeline, unless something concrete needs Python specifically (a library only Python has, real existing depth on the team). One runtime to operate is worth protecting until there's a real reason not to.</div>
         </div>
         <div class="card">
           <div class="stack-row">
             <span class="layer">Realtime</span>
             <span class="choice">Supabase Realtime — dashboards, notifications</span>
-            <span class="verdict keep">Keep</span>
+            <span class="verdict keep">Foundational</span>
           </div>
           <div class="stack-detail">Already on Postgres, so this rides the existing infrastructure instead of standing up a separate pub/sub or websocket service. Minimal-additional-infra is the right bias at this stage.</div>
         </div>
         <div class="card">
           <div class="stack-row">
             <span class="layer">AI / LLM orchestration</span>
-            <span class="choice">— not specified —</span>
-            <span class="verdict gap">Missing</span>
+            <span class="choice">A dedicated layer — the plan-then-fill pipeline, queuing, retries, streaming</span>
+            <span class="verdict priority">Design this first</span>
           </div>
-          <div class="stack-detail">This is the actual product. Nowhere in the stack does it say where model calls happen, how a multi-step generation (plan → fill, per the architecture above) gets queued and retried, or how streaming output reaches the UI. That decision — inside a Next.js server action for simple calls, versus a dedicated service for longer agent loops — belongs in this stack description before anything else does.</div>
+          <div class="stack-detail">This is the actual product, so it doesn't get left implicit. I'd decide up front where model calls live — a Next.js server action is fine for a single quick call, but a multi-step generation (plan → fill, per the architecture above) needs somewhere that can queue, retry, and stream output back to the UI without tying up a request. Everything else in this stack exists to support this layer, not the other way around.</div>
         </div>
       </div>
 
       <div class="verdict-box card">
         <h4>Overall call</h4>
-        <p>Keep the core: Next.js/shadcn/TypeScript, Supabase for Postgres/Auth/RLS, no separate CRUD layer yet, Realtime on Supabase. Four things to resolve before it's final — add a design-token system and a visual editor (both missing entirely, and both compound: get the token library and the editor's data model right early, and everything generated after inherits them for free), confirm Python earns its place for background jobs rather than defaulting to it, and name where AI orchestration actually lives. That last one isn't a nice-to-have; for this product, it's the part of the stack that matters most.</p>
+        <p>The backend instincts here are sound on their own merits: Next.js/shadcn/TypeScript, Supabase for Postgres/Auth/RLS, no separate CRUD layer yet, Realtime on Supabase, one runtime for background work. What I'd add rather than assume: a design-token system and a visual editor, because together they're what stops every generated site from looking the same — and an explicit home for AI orchestration, because that's not an implementation detail, it's the product.</p>
       </div>
     </div>
   </section>
@@ -287,7 +296,7 @@
     <div class="wrap" style="max-width:740px">
       <span class="eyebrow">03 — Try it yourself</span>
       <h2>Build a flow, watch the cost add up</h2>
-      <p class="lede">Drag feature cards into the box below. Each one reveals the cheapest reasonable model for that step and its estimated cost per generation — assumed token counts, illustrative only, same spirit as the <a href="index.html">research brief</a>.</p>
+      <p class="lede">Drag feature cards into the box below — now including design token selection and brand-kit intake, not just content generation. Each one reveals the cheapest reasonable model for that step and its estimated cost per generation — assumed token counts, illustrative only, same spirit as the <a href="index.html">research brief</a>.</p>
     </div>
     <div class="wrap">
       <div class="palette" id="palette"></div>
@@ -319,7 +328,9 @@
     { id:'code', name:'Code / component generation', desc:'Booking tools, dashboards — real app features.', tag:'coding', models:['Kimi K2.7 Code','Qwen3 Coder'], cost:0.010970 },
     { id:'edit', name:'Chat-based edit request', desc:'A targeted diff from a conversational ask.', tag:'editing', models:['Claude Haiku 4.5','Grok 4.1'], cost:0.002500 },
     { id:'vision', name:'Screenshot / image understanding', desc:'Turn an uploaded reference into a spec.', tag:'multimodal', models:['Gemini 3.1 Pro','GPT-5.5'], cost:0.007200 },
-    { id:'flag', name:'Factual-claim flagging', desc:'Catch hours, prices, contacts before publish.', tag:'safety check', models:['Command R7B','GPT-5 Nano'], cost:0.000023 }
+    { id:'flag', name:'Factual-claim flagging', desc:'Catch hours, prices, contacts before publish.', tag:'safety check', models:['Command R7B','GPT-5 Nano'], cost:0.000023 },
+    { id:'tokens', name:'Design token selection', desc:'Pick and remix a palette, type pairing, spacing scale.', tag:'design', models:['Command R7B','Claude Haiku 4.5'], cost:0.000031 },
+    { id:'brandkit', name:'Brand kit intake (uploaded guidelines)', desc:'Parse an uploaded logo, palette, or style PDF into usable tokens.', tag:'multimodal', models:['Gemini 3.1 Pro','GPT-5.5'], cost:0.007600 }
   ];
 
   var palette = document.getElementById('palette');

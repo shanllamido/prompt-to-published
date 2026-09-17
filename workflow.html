@@ -203,7 +203,7 @@
     <div class="wrap" style="max-width:740px">
       <span class="eyebrow">02 — Engineering stack review</span>
       <h2>A developer's proposed stack — is it right?</h2>
-      <p class="lede">Reviewed layer by layer. Short answer: the core is solid and worth keeping — two things are worth pushing on before it's final.</p>
+      <p class="lede">Reviewed layer by layer, now including the design and editing experience the original list left out entirely. Short answer: the backend core is solid and worth keeping — four things are worth adding or pushing on before it's final.</p>
     </div>
     <div class="wrap">
       <div class="stack-list">
@@ -214,6 +214,22 @@
             <span class="verdict keep">Keep</span>
           </div>
           <div class="stack-detail">Standard, well-supported, fast to build in. Server actions cut boilerplate; shadcn ships accessible components you own (copy-in, not a runtime dependency) instead of a locked-in design system. Right call for a small team moving fast.</div>
+        </div>
+        <div class="card">
+          <div class="stack-row">
+            <span class="layer">Design system / theming</span>
+            <span class="choice">— not specified —</span>
+            <span class="verdict gap">Missing</span>
+          </div>
+          <div class="stack-detail">This is where "sameness at scale" either gets solved or doesn't. Let the AI invent arbitrary colors and type pairings freely, and output gets inconsistent and sometimes fails contrast — exactly what a pre-publish accessibility audit is supposed to catch after the fact. Better: a versioned library of curated design tokens — palette pairs, type pairings, spacing/radius scales, the same idea the research brief's own category engine uses — that the AI <em>selects and remixes</em> rather than invents from scratch. Every generated site inherits a baseline of taste for free, and the accessibility check becomes a formality instead of a rescue.</div>
+        </div>
+        <div class="card">
+          <div class="stack-row">
+            <span class="layer">Visual editor (UI/UX)</span>
+            <span class="choice">— not specified —</span>
+            <span class="verdict gap">Missing</span>
+          </div>
+          <div class="stack-detail">Chat-based edits cover content changes. They don't cover "move this," "make this section bigger," "swap this layout variant" — real UI/UX editing needs a visual surface, not just a text box. Build it directly on top of shadcn/ui and the section-slot data model already in the stack — click to select a section, edit text inline, adjust structured properties (variant, spacing, color) in a panel — rather than adopting a third-party page-builder framework. That avoids the exact trap flagged in the Lovable research: inheriting someone else's data model and UX instead of owning your own.</div>
         </div>
         <div class="card">
           <div class="stack-row">
@@ -259,7 +275,7 @@
 
       <div class="verdict-box card">
         <h4>Overall call</h4>
-        <p>Keep the core: Next.js/shadcn/TypeScript, Supabase for Postgres/Auth/RLS, no separate CRUD layer yet, Realtime on Supabase. Two things to resolve before it's final — confirm Python earns its place for background jobs rather than defaulting to it, and name where AI orchestration actually lives. That second one isn't a nice-to-have; for this product, it's the part of the stack that matters most.</p>
+        <p>Keep the core: Next.js/shadcn/TypeScript, Supabase for Postgres/Auth/RLS, no separate CRUD layer yet, Realtime on Supabase. Four things to resolve before it's final — add a design-token system and a visual editor (both missing entirely, and both compound: get the token library and the editor's data model right early, and everything generated after inherits them for free), confirm Python earns its place for background jobs rather than defaulting to it, and name where AI orchestration actually lives. That last one isn't a nice-to-have; for this product, it's the part of the stack that matters most.</p>
       </div>
     </div>
   </section>

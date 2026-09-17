@@ -3,1422 +3,460 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Prompt to Published — Product case study</title>
-<meta name="description" content="A working simulated version of an AI website builder's core loop, plus the product case study behind it. A work sample by Shanelle Llamido." />
+<title>Cost Per Generation</title>
+<meta name="description" content="A research brief on Lovable's weaknesses to leverage, token-economics tactics, and a full LLM comparison — prepared for IONOS AI App & Sitebuilder prep. No model picked yet." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:wght@500;600;700&family=Poppins:wght@400;500;600&family=Cormorant+Garamond:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&family=Oswald:wght@500;600;700&family=Lora:wght@500;600;700&family=Abril+Fatface&family=Quicksand:wght@500;600;700&family=Sora:wght@500;600;700&family=Manrope:wght@400;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-/* ============ TOKENS ============ */
 :root{
-  --bg:#EEF1F5;
+  --bg:#EEF0EA;
   --surface:#FFFFFF;
-  --surface-2:#F4F6F9;
-  --ink:#12181F;
-  --soft-ink:#4A5563;
-  --hairline:#CBD3DC;
-  --accent:#D48B2A;
-  --on-accent:#6B4110;
-  --accent-2:#2E8C82;
-  --success:#2E8C57;
-  --shadow:0 1px 2px rgba(18,24,31,.04), 0 12px 32px -12px rgba(18,24,31,.16);
-  --font-display:'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-body:'Work Sans', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  --font-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --maxw:1160px;
-  --radius:10px;
+  --surface-2:#F5F3EE;
+  --ink:#1B1F1A;
+  --soft-ink:#565F55;
+  --hairline:#D6D9CE;
+  --accent:#A9762E;
+  --on-accent:#3A2404;
+  --good:#4B7A4A;
+  --bad:#A64B33;
+  --font-display:'Newsreader', Georgia, serif;
+  --font-body:'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono:'IBM Plex Mono', ui-monospace, monospace;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#10151C;
-    --surface:#171F29;
-    --surface-2:#1D2733;
-    --ink:#E7ECF2;
-    --soft-ink:#AEB9C6;
-    --hairline:#2B3644;
-    --accent:#E8A23D;
-    --on-accent:#2E1E07;
-    --accent-2:#4FC2B6;
-    --success:#48C07E;
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 44px -16px rgba(0,0,0,.6);
+    --bg:#14160F; --surface:#1C1F17; --surface-2:#22261B;
+    --ink:#ECEFE6; --soft-ink:#AFB8A8; --hairline:#34392B;
+    --accent:#D6A54E; --on-accent:#2A1B02; --good:#6FA36B; --bad:#C97457;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#10151C;
-  --surface:#171F29;
-  --surface-2:#1D2733;
-  --ink:#E7ECF2;
-  --soft-ink:#AEB9C6;
-  --hairline:#2B3644;
-  --accent:#E8A23D;
-  --on-accent:#2E1E07;
-  --accent-2:#4FC2B6;
-  --success:#48C07E;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 44px -16px rgba(0,0,0,.6);
+  --bg:#14160F; --surface:#1C1F17; --surface-2:#22261B;
+  --ink:#ECEFE6; --soft-ink:#AFB8A8; --hairline:#34392B;
+  --accent:#D6A54E; --on-accent:#2A1B02; --good:#6FA36B; --bad:#C97457;
 }
 
-/* ============ BASE ============ */
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion: reduce){
-  html{scroll-behavior:auto}
-  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
-}
 body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:var(--font-body);
-  font-size:16px;
-  line-height:1.6;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeLegibility;
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body); font-size:16px; line-height:1.6;
+  padding:0 20px; -webkit-font-smoothing:antialiased;
 }
-h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;line-height:1.15;margin:0 0 .4em;letter-spacing:-.01em}
-h1{font-size:clamp(2.1rem,5.2vw,3.5rem);font-optical-sizing:auto}
-h2{font-size:clamp(1.6rem,3.4vw,2.35rem)}
-h3{font-size:1.18rem}
-p{margin:0 0 1rem}
-a{color:inherit}
-em{font-style:italic}
-.i{font-style:italic;font-family:var(--font-display)}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--accent)}
 
-:focus-visible{outline:2.5px solid var(--accent-2);outline-offset:3px;border-radius:3px}
+.wrap{max-width:740px;margin:0 auto}
+.wide{max-width:1180px;margin:0 auto}
+main{padding-block:3rem 5rem}
+
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.15;margin:0 0 .4em;text-wrap:balance}
+h1{font-size:clamp(2rem,5vw,2.7rem);letter-spacing:-.01em}
+h2{font-size:clamp(1.4rem,3vw,1.85rem);margin-top:0}
+h3{font-size:1.15rem}
+em{font-style:italic}
+p{margin:0 0 1rem;max-width:66ch}
+.lede{color:var(--soft-ink);font-size:1.05rem;max-width:62ch}
 
 .eyebrow{
-  font-family:var(--font-mono);
-  font-size:.72rem;
-  text-transform:uppercase;
-  letter-spacing:.16em;
-  font-weight:500;
-  color:var(--accent-2);
-  margin:0 0 1rem;
-  display:block;
+  font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;
+  letter-spacing:.14em;color:var(--accent);font-weight:500;margin:0 0 .9rem;display:block;
 }
-.section{
-  max-width:var(--maxw);
-  margin:0 auto;
-  padding:clamp(3.5rem,8vw,6rem) clamp(1.15rem,4vw,2.5rem);
-  scroll-margin-top:84px;
-}
-.section-lead{
-  max-width:62ch;
-  color:var(--soft-ink);
-  font-size:1.06rem;
-}
-.rule{height:1px;background:var(--hairline);border:0;max-width:var(--maxw);margin:0 auto}
-
-/* ============ TOP BAR ============ */
-.topbar{
-  position:sticky;top:0;z-index:50;
-  background:color-mix(in srgb, var(--bg) 86%, transparent);
-  backdrop-filter:saturate(160%) blur(10px);
-  -webkit-backdrop-filter:saturate(160%) blur(10px);
-  border-bottom:1px solid var(--hairline);
-}
-.topbar-inner{
-  max-width:var(--maxw);margin:0 auto;
-  padding:.85rem clamp(1.15rem,4vw,2.5rem);
-  display:flex;align-items:center;justify-content:space-between;gap:1rem;
-}
-.brand{
-  font-family:var(--font-mono);
-  font-size:.78rem;
-  font-weight:500;
-  letter-spacing:.02em;
-  color:var(--ink);
-  text-decoration:none;
-  line-height:1.3;
-}
-.brand{text-decoration:none}
-.brand b{color:var(--ink);font-weight:600}
-.brand span{color:var(--soft-ink)}
-.topnav{display:flex;gap:.15rem;flex-wrap:wrap}
-.topnav a{
-  font-family:var(--font-mono);
-  font-size:.72rem;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  text-decoration:none;
-  color:var(--soft-ink);
-  padding:.4rem .6rem;
-  border-radius:6px;
-  transition:color .15s, background .15s;
-}
-.topnav a:hover{color:var(--ink);background:var(--surface-2)}
-.topnav a.is-active{color:var(--accent-2)}
-@media (max-width:720px){ .topnav{display:none} }
-
-/* ============ INTRO ============ */
-.intro h1{max-width:16ch}
-.intro h1 .i{color:var(--accent)}
-.intro .sub{max-width:60ch;font-size:1.12rem;color:var(--soft-ink);margin-top:1.4rem}
-.byline{
-  font-family:var(--font-mono);
-  font-size:.75rem;
-  color:var(--soft-ink);
-  margin-top:1.6rem;
-  padding-top:1.2rem;
-  border-top:1px solid var(--hairline);
-  max-width:52ch;
-}
-
-/* ============ WORKBENCH ============ */
-.workbench{background:var(--surface);border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline)}
-.wb-head{max-width:var(--maxw);margin:0 auto;padding:clamp(3rem,6vw,4.5rem) clamp(1.15rem,4vw,2.5rem) 0}
-.wb-head h2{margin-bottom:.35em}
-.controls{
-  max-width:var(--maxw);margin:0 auto;
-  padding:1.6rem clamp(1.15rem,4vw,2.5rem) 0;
-  display:flex;flex-direction:column;gap:1rem;
-}
-.control-row{display:flex;gap:.7rem;flex-wrap:wrap;align-items:stretch}
-.field{
-  flex:1 1 320px;
-  display:flex;align-items:center;
-  background:var(--bg);
-  border:1px solid var(--hairline);
-  border-radius:999px;
-  padding:.2rem .35rem .2rem 1.1rem;
-}
-.field:focus-within{border-color:var(--accent-2);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent-2) 22%,transparent)}
-.field input{
-  flex:1;border:0;background:transparent;color:var(--ink);
-  font-family:var(--font-body);font-size:.98rem;padding:.6rem 0;
-}
-.field input:focus{outline:none}
-.field input::placeholder{color:var(--soft-ink)}
-.btn{
-  font-family:var(--font-mono);
-  font-size:.78rem;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  font-weight:500;
-  border:0;cursor:pointer;
-  border-radius:999px;
-  padding:.7rem 1.4rem;
-  background:var(--accent);
-  color:var(--on-accent);
-  transition:filter .15s, transform .05s;
-  white-space:nowrap;
-}
-.btn:hover{filter:brightness(1.05)}
-.btn:active{transform:translateY(1px)}
-.btn[disabled]{opacity:.55;cursor:progress}
-.btn-generate{flex:0 0 auto}
-
-.toggle-group{
-  display:inline-flex;
-  background:var(--bg);
-  border:1px solid var(--hairline);
-  border-radius:999px;
-  padding:3px;
-  gap:2px;
-}
-.toggle-group button{
-  font-family:var(--font-mono);
-  font-size:.7rem;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  border:0;background:transparent;color:var(--soft-ink);
-  padding:.5rem .85rem;border-radius:999px;cursor:pointer;
-  transition:color .15s,background .15s;
-}
-.toggle-group button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-.toggle-label{
-  font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;
-  letter-spacing:.12em;color:var(--soft-ink);align-self:center;margin-right:.15rem;
-}
-.chips{display:flex;flex-wrap:wrap;gap:.45rem}
-.chip{
-  font-family:var(--font-mono);font-size:.72rem;
-  background:var(--bg);border:1px solid var(--hairline);
-  color:var(--soft-ink);border-radius:999px;
-  padding:.4rem .8rem;cursor:pointer;
-  transition:color .15s,border-color .15s;
-}
-.chip:hover{color:var(--ink);border-color:var(--accent-2)}
-
-.wb-grid{
-  max-width:var(--maxw);margin:0 auto;
-  padding:1.8rem clamp(1.15rem,4vw,2.5rem) clamp(3rem,6vw,4.5rem);
-  display:grid;grid-template-columns:1.55fr 1fr;gap:1.4rem;align-items:start;
-}
-@media (max-width:960px){ .wb-grid{grid-template-columns:1fr} }
-
-/* browser frame */
-.frame{
-  border:1px solid var(--hairline);
-  border-radius:12px;
-  background:var(--surface-2);
-  overflow:hidden;
-  box-shadow:var(--shadow);
-}
-.frame-bar{
-  display:flex;align-items:center;gap:.5rem;
-  padding:.6rem .8rem;
-  background:var(--surface);
-  border-bottom:1px solid var(--hairline);
-}
-.frame-bar .dot{width:11px;height:11px;border-radius:50%;background:var(--hairline);flex:0 0 auto}
-.frame-bar .dot:nth-child(1){background:#E1654E}
-.frame-bar .dot:nth-child(2){background:#E0A63C}
-.frame-bar .dot:nth-child(3){background:#4FA96B}
-.frame-bar .url{
-  flex:1;margin-left:.4rem;
+.meta{
   font-family:var(--font-mono);font-size:.74rem;color:var(--soft-ink);
-  background:var(--bg);border:1px solid var(--hairline);border-radius:6px;
-  padding:.32rem .6rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
+  padding-block:.7rem;margin:1.4rem 0 0;display:flex;gap:1.5rem;flex-wrap:wrap;
 }
-.frame-body{position:relative;min-height:420px;background:var(--surface)}
+.meta b{color:var(--ink);font-weight:500}
 
-/* build checklist */
-.build{
-  padding:1.6rem 1.5rem;
-  font-family:var(--font-mono);font-size:.82rem;
-}
-.build[hidden]{display:none}
-.build h4{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent-2);margin-bottom:1rem;font-weight:500}
-.build ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.6rem}
-.build li{display:flex;align-items:center;gap:.7rem;color:var(--soft-ink);transition:color .2s}
-.build li .mk{width:1.2em;text-align:center;color:var(--hairline)}
-.build li.active{color:var(--ink)}
-.build li.active .mk{color:var(--accent)}
-.build li.done{color:var(--soft-ink)}
-.build li.done .mk{color:var(--success)}
+.rule{height:1px;background:var(--hairline);border:0;max-width:1180px;margin:3.2rem auto}
+section{max-width:1180px;margin:0 auto}
+.section-inner{max-width:740px}
+.wide-inner{max-width:1180px}
 
-/* generated site preview */
-.site-wrap{padding:0}
-.site-wrap[hidden]{display:none}
-.site{
-  --p-radius:8px;
-  --p-weight:600;
-  --p-h1:2.05rem;
-  font-family:var(--p-body);
-  color:var(--p-ink);
-  background:var(--p-secondary);
+.note{
+  font-family:var(--font-mono);font-size:.78rem;color:var(--soft-ink);
+  background:var(--surface-2);border:1px solid var(--hairline);border-radius:6px;
+  padding:.75rem .9rem;margin:1rem 0 1.6rem;max-width:66ch;
 }
-.site *{box-sizing:border-box}
-.site h1,.site h2{font-family:var(--p-heading);font-weight:var(--p-weight);line-height:1.12;letter-spacing:-.015em;margin:0}
-.site-hero{
-  padding:2.4rem 2rem 2.2rem;
-  border-bottom:1px solid color-mix(in srgb,var(--p-ink) 14%,transparent);
-}
-.ai-badge{
-  display:inline-block;
-  font-family:var(--font-mono);
-  font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--p-ink);
-  border:1px dashed color-mix(in srgb,var(--p-ink) 45%,transparent);
-  border-radius:5px;
-  padding:.3rem .55rem;
-  margin-bottom:1.1rem;
-  opacity:.82;
-}
-.site-hero h1{font-size:var(--p-h1);margin-bottom:.5rem;color:var(--p-primary)}
-.site .tagline{
-  font-size:1.02rem;max-width:44ch;margin:0 0 1.5rem;
-  color:color-mix(in srgb,var(--p-ink) 82%,transparent);
-}
-.site-cta{
-  display:inline-block;
-  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
-  background:var(--p-primary);
-  color:var(--p-secondary);
-  padding:.7rem 1.2rem;
-  border-radius:var(--p-radius);
-  text-decoration:none;
-}
-.site-section{padding:1.8rem 2rem;border-bottom:1px solid color-mix(in srgb,var(--p-ink) 12%,transparent)}
-.site-section h2{
-  font-size:.72rem;font-family:var(--font-mono);font-weight:500;
-  text-transform:uppercase;letter-spacing:.14em;
-  color:color-mix(in srgb,var(--p-ink) 60%,transparent);
-  margin-bottom:.8rem;
-}
-.site-about p{margin:0;max-width:58ch;font-size:.98rem;line-height:1.65}
-.site-features ul{list-style:none;margin:0;padding:0;display:grid;gap:.75rem}
-.site-features li{display:flex;gap:.7rem;align-items:flex-start;font-size:.94rem}
-.site-features svg{flex:0 0 auto;width:18px;height:18px;margin-top:2px;color:var(--p-primary)}
-.site-quote{margin:0;padding:1.8rem 2rem;border-bottom:1px solid color-mix(in srgb,var(--p-ink) 12%,transparent)}
-.site-quote p{font-style:italic;font-family:var(--p-heading);font-size:1.12rem;line-height:1.4;margin:0 0 .6rem;color:var(--p-primary)}
-.site-quote cite{font-style:normal;font-family:var(--font-mono);font-size:.72rem;color:color-mix(in srgb,var(--p-ink) 62%,transparent)}
-.site-foot{
-  padding:1.3rem 2rem;
-  font-family:var(--font-mono);font-size:.68rem;
-  color:color-mix(in srgb,var(--p-ink) 58%,transparent);
-  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
-}
+.note b{color:var(--ink)}
 
-/* telemetry */
-.telemetry{
-  border:1px solid var(--hairline);
-  border-radius:12px;
-  background:var(--surface);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  position:sticky;top:84px;
-}
-.telemetry-head{
-  padding:.7rem .9rem;
-  border-bottom:1px solid var(--hairline);
-  display:flex;align-items:center;gap:.55rem;
-  font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--soft-ink);
-}
-.telemetry-head .live{
-  width:7px;height:7px;border-radius:50%;background:var(--accent-2);
-  box-shadow:0 0 0 0 color-mix(in srgb,var(--accent-2) 60%,transparent);
-  animation:pulse 2s infinite;
-}
-@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent-2) 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
-.log{
-  margin:0;padding:.9rem;
-  font-family:var(--font-mono);font-size:.72rem;line-height:1.7;
-  height:392px;overflow-y:auto;
-  white-space:pre-wrap;word-break:break-word;
-}
-.log .row{display:block}
-.log .t{color:var(--soft-ink)}
-.log .ev{color:var(--accent-2)}
-.log .ok{color:var(--success)}
-.log .pay{color:var(--ink)}
-.log .sys{color:var(--soft-ink);opacity:.8}
+/* strengths/weaknesses */
+.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin:1.6rem 0}
+@media (max-width:640px){ .sw-grid{grid-template-columns:1fr} }
+.sw{background:var(--surface);border:1px solid var(--hairline);border-radius:8px;padding:1.2rem 1.3rem}
+.sw h3{font-size:.72rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.9rem}
+.sw.strength h3{color:var(--good)}
+.sw.weakness h3{color:var(--bad)}
+.sw ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.7rem}
+.sw li{font-size:.93rem;color:var(--ink);padding-left:1rem;position:relative}
+.sw.strength li::before{content:"+";position:absolute;left:0;color:var(--good);font-family:var(--font-mono);font-weight:600}
+.sw.weakness li::before{content:"–";position:absolute;left:0;color:var(--bad);font-family:var(--font-mono);font-weight:600}
 
-/* ============ WHY / GENERIC PROSE ============ */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:2.2rem;margin-top:2rem}
-.two-col p{color:var(--soft-ink);font-size:1.03rem;margin:0}
-@media (max-width:760px){ .two-col{grid-template-columns:1fr;gap:1.2rem} }
+.leverage{display:flex;flex-direction:column;gap:1rem;margin:1.6rem 0}
+.lev{display:flex;gap:1rem;padding:1.1rem 1.2rem;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--accent)}
+.lev .num{font-family:var(--font-mono);font-size:.85rem;color:var(--accent);font-weight:600;flex:0 0 auto}
+.lev h4{margin:0 0 .3rem;font-size:1rem;font-weight:600}
+.lev p{margin:0;font-size:.92rem;color:var(--soft-ink)}
+.lev .weak-tag{font-family:var(--font-mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--bad);display:block;margin-bottom:.3rem}
 
-/* archetype cards */
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-top:2.2rem}
-@media (max-width:860px){ .cards{grid-template-columns:1fr} }
-.card{
-  background:var(--surface);
-  border:1px solid var(--hairline);
-  border-radius:var(--radius);
-  padding:1.5rem 1.4rem;
+/* levers */
+.levers{display:flex;flex-direction:column;gap:0;border:1px solid var(--hairline);border-radius:8px;overflow:hidden;margin:1.6rem 0}
+.lever-row{display:grid;grid-template-columns:2.4rem 1fr auto;gap:1rem;align-items:start;padding:1rem 1.2rem;border-bottom:1px solid var(--hairline);background:var(--surface)}
+.lever-row:last-child{border-bottom:0}
+.lever-row .n{font-family:var(--font-display);font-size:1.4rem;color:var(--accent);font-weight:600}
+.lever-row h4{margin:0 0 .3rem;font-size:.98rem}
+.lever-row p{margin:0;font-size:.9rem;color:var(--soft-ink);max-width:56ch}
+.lever-row .save{
+  font-family:var(--font-mono);font-size:.78rem;color:var(--good);
+  white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;
 }
-.card .tag{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-2);display:block;margin-bottom:.7rem}
-.card h3{margin-bottom:.4rem}
-.card p{color:var(--soft-ink);font-size:.95rem;margin:0}
-.card .pull{
-  margin-top:1rem;padding-top:.9rem;border-top:1px solid var(--hairline);
-  font-family:var(--font-display);font-style:italic;font-size:1rem;color:var(--ink);
-}
+@media (max-width:560px){ .lever-row{grid-template-columns:2rem 1fr}.lever-row .save{grid-column:2;text-align:left} }
 
-/* principles */
-.principles{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem 2.4rem;margin-top:2.2rem;counter-reset:pr}
-@media (max-width:760px){ .principles{grid-template-columns:1fr} }
-.principle{display:flex;gap:1rem}
-.principle .n{
-  font-family:var(--font-mono);font-size:.8rem;color:var(--accent);
-  font-weight:500;flex:0 0 auto;padding-top:.15rem;
+/* filter chips */
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.4rem 0 1rem}
+.chip{
+  font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;
+  background:var(--surface);border:1px solid var(--hairline);color:var(--soft-ink);
+  border-radius:999px;padding:.4rem .8rem;cursor:pointer;transition:.15s;
 }
-.principle h3{font-size:1.05rem;margin-bottom:.3rem}
-.principle p{color:var(--soft-ink);font-size:.95rem;margin:0}
-.principle .demo-note{
-  display:inline-block;margin-top:.5rem;
-  font-family:var(--font-mono);font-size:.66rem;letter-spacing:.05em;
-  color:var(--accent-2);border:1px solid color-mix(in srgb,var(--accent-2) 40%,transparent);
-  border-radius:5px;padding:.2rem .5rem;
-}
+.chip:hover{border-color:var(--accent)}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 
-/* roadmap timeline */
-.timeline{margin-top:2.4rem;position:relative;padding-left:1.9rem}
-.timeline::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--hairline)}
-.phase{position:relative;padding-bottom:2.2rem}
-.phase:last-child{padding-bottom:0}
-.phase::before{
-  content:"";position:absolute;left:-1.9rem;top:4px;
-  width:14px;height:14px;border-radius:50%;
-  background:var(--surface);border:2px solid var(--accent);
-}
-.phase .ph{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-2);display:block;margin-bottom:.35rem}
-.phase h3{margin-bottom:.35rem}
-.phase p{color:var(--soft-ink);font-size:.97rem;margin:0 0 .8rem;max-width:56ch}
-.krs{display:flex;flex-wrap:wrap;gap:.4rem}
-.kr{
-  font-family:var(--font-mono);font-size:.68rem;
-  background:var(--surface-2);border:1px solid var(--hairline);
-  border-radius:5px;padding:.3rem .55rem;color:var(--soft-ink);
-}
-
-/* execution / decisions */
-.decisions{margin-top:2.2rem;display:flex;flex-direction:column;gap:1rem}
-.decision{border:1px solid var(--hairline);border-radius:var(--radius);background:var(--surface);padding:1.4rem}
-.decision-num{font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-2);display:block;margin-bottom:.4rem}
-.decision h3{font-size:1.1rem;margin:0 0 1rem;max-width:40ch}
-.opt-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
-.opt{
-  font-family:var(--font-mono);font-size:.72rem;text-align:left;
-  background:var(--bg);border:1px solid var(--hairline);color:var(--soft-ink);
-  border-radius:7px;padding:.5rem .75rem;cursor:pointer;
-  transition:border-color .15s,color .15s,background .15s;
-}
-.opt:hover{color:var(--ink);border-color:var(--soft-ink)}
-.opt[aria-selected="true"]{background:var(--surface);border-color:var(--accent-2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent-2)}
-.opt .pick{margin-left:.5rem;color:var(--accent);font-weight:600}
-.decision-detail{
-  border-left:2px solid var(--accent-2);
-  padding:.1rem 0 .1rem 1rem;margin:0 0 1.15rem;
-  font-size:.94rem;color:var(--soft-ink);min-height:2.5em;
-}
-.decision-detail strong{color:var(--ink);font-weight:600}
-.decision-call{background:var(--surface-2);border:1px solid var(--hairline);border-radius:8px;padding:.85rem 1rem;margin-bottom:1.1rem}
-.decision-foot{display:grid;grid-template-columns:1fr 1fr;gap:1rem 1.5rem}
-@media (max-width:640px){ .decision-foot{grid-template-columns:1fr} }
-.decision .dl{font-family:var(--font-mono);font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--soft-ink);display:block;margin-bottom:.3rem}
-.decision-call p{margin:0;font-size:.93rem;color:var(--ink)}
-.decision-foot p{margin:0;font-size:.9rem;color:var(--soft-ink)}
-
-/* KPI grid */
-.kpi-note{
-  font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink);
-  margin-top:.6rem;
-}
-.kpis{
-  display:grid;grid-template-columns:repeat(5,1fr);
-  border:1px solid var(--hairline);border-radius:var(--radius);
-  overflow:hidden;margin-top:1.8rem;
-}
-@media (max-width:900px){ .kpis{grid-template-columns:repeat(2,1fr)} }
-@media (max-width:440px){ .kpis{grid-template-columns:1fr} }
-.kpi{
-  padding:1.3rem 1.2rem;
-  border-right:1px solid var(--hairline);
-  border-bottom:1px solid var(--hairline);
-  background:var(--surface);
-}
-.kpi .label{font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--soft-ink);display:block;margin-bottom:.6rem;min-height:2.4em}
-.kpi .val{font-family:var(--font-display);font-size:1.7rem;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.kpi .hint{font-size:.82rem;color:var(--soft-ink);margin-top:.3rem;display:block}
-
-/* landscape table */
-.table-wrap{overflow-x:auto;margin-top:1.8rem;border:1px solid var(--hairline);border-radius:var(--radius);-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;min-width:640px}
-th,td{text-align:left;padding:.95rem 1.1rem;vertical-align:top;font-size:.93rem}
+.table-wrap{overflow-x:auto;border:1px solid var(--hairline);border-radius:8px;margin-bottom:1.6rem}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:.86rem}
+th,td{text-align:left;padding:.65rem .85rem;vertical-align:top;border-bottom:1px solid var(--hairline)}
 thead th{
-  font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;
-  color:var(--soft-ink);background:var(--surface-2);border-bottom:1px solid var(--hairline);
+  font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--soft-ink);background:var(--surface-2);white-space:nowrap;
 }
-tbody tr{border-bottom:1px solid var(--hairline)}
-tbody tr:last-child{border-bottom:0}
-tbody td:first-child{font-weight:600;color:var(--ink)}
-td{color:var(--soft-ink)}
-tr.opp td{background:color-mix(in srgb,var(--accent) 12%,var(--surface));color:var(--ink)}
-tr.opp td:first-child{color:var(--on-accent)}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) tr.opp td:first-child{color:var(--accent)} }
-:root[data-theme="dark"] tr.opp td:first-child{color:var(--accent)}
+tbody tr{background:var(--surface)}
+tbody tr.hide{display:none}
+tbody tr:last-child td{border-bottom:0}
+td.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+td.model{font-weight:600}
+td.provider{color:var(--soft-ink);white-space:nowrap}
+.tier-row td{background:var(--surface-2);font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:600;padding:.5rem .85rem}
+.tag{
+  display:inline-block;font-family:var(--font-mono);font-size:.62rem;text-transform:uppercase;
+  letter-spacing:.05em;padding:.15rem .4rem;border-radius:4px;margin:0 .2rem .2rem 0;
+  background:var(--surface-2);color:var(--soft-ink);border:1px solid var(--hairline);
+}
+.flag{color:var(--bad);font-family:var(--font-mono)}
 
-/* risks */
-.risks{margin-top:1.8rem;display:grid;gap:0;border:1px solid var(--hairline);border-radius:var(--radius);overflow:hidden}
-.risk{
-  display:grid;grid-template-columns:1fr 1.3fr;gap:1.5rem;
-  padding:1.15rem 1.3rem;border-bottom:1px solid var(--hairline);
+/* feature map */
+.fm-note{
+  display:inline-block;font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--accent);border:1px solid var(--accent);border-radius:5px;
+  padding:.3rem .6rem;margin-bottom:1.2rem;
 }
-.risk:last-child{border-bottom:0}
-@media (max-width:680px){ .risk{grid-template-columns:1fr;gap:.4rem} }
-.risk .r{font-weight:600;color:var(--ink);font-size:.95rem}
-.risk .r::before{content:"Risk — ";font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:#c0603f;display:block;font-weight:500;margin-bottom:.2rem}
-.risk .m{color:var(--soft-ink);font-size:.94rem}
-.risk .m::before{content:"De-risk";font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--success);display:block;margin-bottom:.2rem}
+.fmtable td.candidates{color:var(--soft-ink);font-size:.85rem}
+.fmtable td.candidates b{color:var(--ink);font-weight:600}
 
-/* closing */
-.closing p{max-width:60ch;color:var(--soft-ink);font-size:1.05rem}
-.contact{
-  margin-top:2rem;background:var(--surface);border:1px solid var(--hairline);
-  border-radius:var(--radius);padding:1.6rem 1.5rem;
+footer{
+  border-top:1px solid var(--hairline);margin-top:1rem;padding-block:2.4rem 3rem;
 }
-.contact .who{font-family:var(--font-display);font-size:1.25rem;font-weight:600}
-.contact .re{font-family:var(--font-mono);font-size:.75rem;color:var(--soft-ink);margin:.3rem 0 1rem}
-.contact a.mail{
-  font-family:var(--font-mono);font-size:.8rem;
-  display:inline-block;background:var(--accent);color:var(--on-accent);
-  text-decoration:none;padding:.7rem 1.3rem;border-radius:999px;letter-spacing:.03em;
-}
-
-/* footer */
-footer.disc{
-  border-top:1px solid var(--hairline);
-  background:var(--surface);
-}
-footer.disc .section{padding-top:2rem;padding-bottom:2rem}
-footer.disc p{font-family:var(--font-mono);font-size:.72rem;color:var(--soft-ink);margin:0;max-width:70ch}
-
-/* dot nav */
-.dotnav{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:.9rem}
-.dotnav a{
-  width:9px;height:9px;border-radius:50%;background:var(--hairline);
-  position:relative;transition:background .2s,transform .2s;
-}
-.dotnav a:hover{background:var(--soft-ink)}
-.dotnav a.is-active{background:var(--accent-2);transform:scale(1.35)}
-.dotnav a span{
-  position:absolute;right:18px;top:50%;transform:translateY(-50%);
-  font-family:var(--font-mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;
-  color:var(--soft-ink);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;
-}
-.dotnav a:hover span{opacity:1}
-@media (max-width:1100px){ .dotnav{display:none} }
+footer .wrap{font-size:.82rem;color:var(--soft-ink)}
+footer h4{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--soft-ink);margin:0 0 .6rem}
+footer ol{margin:0 0 1.4rem;padding-left:1.2rem}
+footer li{margin-bottom:.3rem}
+footer a{color:var(--soft-ink);text-decoration:underline}
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <a class="brand" href="#top"><b>Shanelle Llamido</b> <span>— Product, AI Website Builder</span></a>
-    <nav class="topnav" aria-label="Sections">
-      <a href="#demo">Demo</a>
-      <a href="#approach">Approach</a>
-      <a href="#roadmap">Roadmap</a>
-      <a href="#execution">Execution</a>
-      <a href="#metrics">Metrics</a>
-      <a href="#landscape">Landscape</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </div>
-</header>
-
-<nav class="dotnav" aria-hidden="true">
-  <a href="#demo" data-dot="demo"><span>Demo</span></a>
-  <a href="#approach" data-dot="approach"><span>Approach</span></a>
-  <a href="#roadmap" data-dot="roadmap"><span>Roadmap</span></a>
-  <a href="#execution" data-dot="execution"><span>Execution</span></a>
-  <a href="#metrics" data-dot="metrics"><span>Metrics</span></a>
-  <a href="#landscape" data-dot="landscape"><span>Landscape</span></a>
-  <a href="#contact" data-dot="contact"><span>Contact</span></a>
-</nav>
-
-<span id="top"></span>
-
-<!-- INTRO -->
-<header class="section intro">
-  <span class="eyebrow">Work sample — Product Manager, AI Department</span>
-  <h1>What if publishing a website took <span class="i">one sentence?</span></h1>
-  <p class="sub">This page <em>is</em> the work sample. The workbench below is a working, simulated version of the product's core loop — describe a business, watch it become a live page. Everything after it is the product case study behind that loop: who it's for, how it should be built, what to measure, and where it can go wrong.</p>
-  <p class="byline">A product case study by Shanelle Llamido, prepared for the AI Website Builder role.</p>
-</header>
-
-<hr class="rule" />
-
-<!-- WORKBENCH -->
-<section class="workbench" id="demo">
-  <div class="wb-head">
-    <span class="eyebrow">The workbench — live simulated loop</span>
-    <h2>Describe a business. Watch it get published.</h2>
-    <p class="section-lead">A rule-based generator maps your description to an industry template, drafts copy, applies a theme, and "publishes" a page — while a product telemetry panel logs every step, the way a real build would need to be instrumented.</p>
-  </div>
-
-  <div class="controls">
-    <div class="control-row">
-      <label class="field">
-        <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Describe a business</span>
-        <input id="promptInput" type="text" autocomplete="off" placeholder="Describe a business — e.g. 'artisan coffee roastery'" />
-      </label>
-      <button class="btn btn-generate" id="generateBtn" type="button">Generate site</button>
-    </div>
-    <div class="control-row">
-      <span class="toggle-label">Tone</span>
-      <div class="toggle-group" id="toneGroup" role="group" aria-label="Tone">
-        <button type="button" data-tone="Modern" aria-pressed="true">Modern</button>
-        <button type="button" data-tone="Minimal" aria-pressed="false">Minimal</button>
-        <button type="button" data-tone="Bold" aria-pressed="false">Bold</button>
-        <button type="button" data-tone="Playful" aria-pressed="false">Playful</button>
-      </div>
-    </div>
-    <div class="chips" id="chips" aria-label="Examples">
-      <button class="chip" type="button">artisan coffee roastery</button>
-      <button class="chip" type="button">boutique wedding photographer</button>
-      <button class="chip" type="button">downtown yoga studio</button>
-      <button class="chip" type="button">independent law firm</button>
-      <button class="chip" type="button">neighborhood bistro</button>
-      <button class="chip" type="button">curls &amp; color salon</button>
-      <button class="chip" type="button">B2B onboarding SaaS</button>
-      <button class="chip" type="button">youth mentorship nonprofit</button>
+<main>
+  <div class="wrap">
+    <span class="eyebrow">Research brief — desk research, not a decision</span>
+    <h1>Cost per generation</h1>
+    <p class="lede">Three questions for the IONOS AI App &amp; Sitebuilder prep: where can we out-position Lovable, how do we keep the token math honest, and which models are even in scope. Nothing here is a recommendation — <em>you asked to see everything before anyone picks.</em></p>
+    <div class="meta">
+      <span><b>Prepared</b> Sept 17, 2026</span>
+      <span><b>For</b> IONOS PM AI App &amp; Sitebuilder prep</span>
+      <span><b>Status</b> no model chosen</span>
     </div>
   </div>
 
-  <div class="wb-grid">
-    <div class="frame">
-      <div class="frame-bar">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-        <span class="url" id="urlBar">artisan-coffee-roastery.site</span>
-      </div>
-      <div class="frame-body">
-        <div class="build" id="build" hidden aria-live="polite">
-          <h4>Build sequence</h4>
-          <ol id="buildList">
-            <li data-step="0"><span class="mk">○</span> Parsing brief</li>
-            <li data-step="1"><span class="mk">○</span> Selecting layout</li>
-            <li data-step="2"><span class="mk">○</span> Drafting copy</li>
-            <li data-step="3"><span class="mk">○</span> Applying theme</li>
-            <li data-step="4"><span class="mk">○</span> Publishing</li>
-          </ol>
+  <!-- LOVABLE -->
+  <section>
+    <div class="wrap section-inner">
+      <span class="eyebrow">01 — Competitor read</span>
+      <h2>Lovable: where it's strong, where it opens a door</h2>
+      <p class="lede">Lovable is the closest thing to a category leader in AI app generation right now. It's not weak — it's optimized for a specific 80%, and it says so implicitly by pushing power users elsewhere for the last 20%.</p>
+    </div>
+    <div class="wide-inner">
+      <div class="sw-grid">
+        <div class="sw strength">
+          <h3>Strengths</h3>
+          <ul>
+            <li>Fastest path from idea to a clickable prototype — hours, sometimes minutes</li>
+            <li>Full-stack by default via Supabase: auth, database, and backend wiring come with the generation, not just a UI shell</li>
+            <li>Clean, competent default UI — skips the boilerplate of buttons, forms, layout</li>
+            <li>One flow from generation to live deployment, no separate publish step</li>
+          </ul>
         </div>
-        <div class="site-wrap" id="siteWrap"></div>
+        <div class="sw weakness">
+          <h3>Weaknesses</h3>
+          <ul>
+            <li>Falls apart on original UI, custom API integrations, and complex backend logic — the "last 20%" pushes serious users out to Cursor or Claude Code</li>
+            <li>Credit spend is opaque — users report not knowing what a given action cost until after it's gone, making monthly budgets a guess</li>
+            <li>Reported freezing and reliability issues under load — risky for anyone treating it as their only build environment</li>
+            <li>Hard message/complexity limits — complex logic trips the AI, and power users hit the ceiling</li>
+          </ul>
+        </div>
       </div>
     </div>
 
-    <aside class="telemetry">
-      <div class="telemetry-head"><span class="live"></span> Product telemetry</div>
-      <div class="log" id="log" role="log" aria-live="polite" aria-label="Telemetry event log"></div>
-    </aside>
-  </div>
-</section>
-
-<!-- WHY THIS WHY NOW -->
-<section class="section" id="approach">
-  <span class="eyebrow">Why this, why now</span>
-  <h2>The gap was never power. It was the <span class="i">first ten minutes.</span></h2>
-  <div class="two-col">
-    <p>Website builders never had a power problem. Wix, Squarespace, and WordPress can already build almost anything a small business needs. What they never solved is the first ten minutes: the blank canvas, the seventy-template carousel, the slow realization that a decent site is a lost weekend. Most people close the tab. The ones who push through tend to produce something that looks like every other site built from the same starting point.</p>
-    <p>AI collapses those ten minutes into one sentence and a few seconds. But the hard part isn't the model — it's a product decision. Ship something fast and generic enough and every AI-built site converges on the same three layouts, the same voice, the same stock structure. Speed without a point of view is just a faster template. The job is to make the generated draft a starting point people actually want to edit, not a ceiling they have to escape.</p>
-  </div>
-</section>
-
-<hr class="rule" />
-
-<!-- ARCHETYPES -->
-<section class="section" id="archetypes">
-  <span class="eyebrow">Who's on the other end of the prompt</span>
-  <h2>Three people, three definitions of "done."</h2>
-  <div class="cards">
-    <div class="card">
-      <span class="tag">Archetype 01</span>
-      <h3>The Side-Hustler</h3>
-      <p>Launching a thing this week around a full-time job. Has a name, a logo maybe, and forty spare minutes tonight. Judges the product on whether there's a real URL by bedtime.</p>
-      <p class="pull">"Good enough, published" beats "perfect, still in draft."</p>
-    </div>
-    <div class="card">
-      <span class="tag">Archetype 02</span>
-      <h3>The Local Business Owner</h3>
-      <p>Runs a salon, a clinic, a bistro. Low tech confidence, high stakes — this site represents the business. Won't open dev tools, won't debug a broken layout, will just leave if it feels fragile.</p>
-      <p class="pull">Needs to trust it before they'll ship it.</p>
-    </div>
-    <div class="card">
-      <span class="tag">Archetype 03</span>
-      <h3>The Independent Creator</h3>
-      <p>A designer, writer, or consultant who will keep tweaking for weeks. Cares about every margin. The real stress test of whether editing an AI draft feels good or feels like a fight.</p>
-      <p class="pull">The true test of the editing experience.</p>
-    </div>
-  </div>
-</section>
-
-<hr class="rule" />
-
-<!-- PRINCIPLES -->
-<section class="section" id="principles">
-  <span class="eyebrow">Product principles</span>
-  <h2>Four rules I'd hold the roadmap to.</h2>
-  <div class="principles">
-    <div class="principle">
-      <span class="n">01</span>
-      <div>
-        <h3>Speed earns the first look. Quality earns the domain purchase.</h3>
-        <p>A fast generation buys thirty seconds of attention. The domain purchase depends on whether the draft survives a careful read — so optimize the whole funnel, not the first screen.</p>
+    <div class="wrap section-inner">
+      <h3 style="font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink);margin-top:2rem">Leverage points — ranked by how directly they turn a weakness into a feature</h3>
+      <div class="leverage">
+        <div class="lev">
+          <span class="num">01</span>
+          <div>
+            <span class="weak-tag">Targets: credit opacity</span>
+            <h4>Show the price before the person pays it</h4>
+            <p>Lovable's most repeated complaint is not knowing what a credit bought. A live, pre-commit estimate — "this edit will cost ~2 credits" before the user clicks generate, not a balance that just goes down — turns the JD's "token economics as a core product parameter" into a visible trust feature, not just a backend cost model.</p>
+          </div>
+        </div>
+        <div class="lev">
+          <span class="num">02</span>
+          <div>
+            <span class="weak-tag">Targets: the last-20% cliff</span>
+            <h4>Don't out-code it — build the exit ramp</h4>
+            <p>Lovable is explicitly strongest at 0→80%, then hands users off to a real IDE. IONOS doesn't need to win the "complex custom logic" fight — it needs the 80→100% stretch to be survivable inside the product: a clean code export, or a documented handoff path to a developer, rather than pretending the AI can finish everything.</p>
+          </div>
+        </div>
+        <div class="lev">
+          <span class="num">03</span>
+          <div>
+            <span class="weak-tag">Targets: reliability under load</span>
+            <h4>Let infrastructure be the differentiator it already is</h4>
+            <p>IONOS's core business is hosting and uptime — the exact muscle needed to fix "it freezes mid-generation." A builder that leans on "99.99% uptime" messaging only earns that claim if the builder itself doesn't stall. This is a genuine structural advantage over an AI-first startup with no infrastructure legacy.</p>
+          </div>
+        </div>
+        <div class="lev">
+          <span class="num">04</span>
+          <div>
+            <span class="weak-tag">Targets: hard complexity limits</span>
+            <h4>Degrade gracefully instead of failing hard</h4>
+            <p>Instead of a wall when a request is too complex, route it to a stronger model automatically and ask for confirmation if it costs materially more — flagged plainly, not silently charged. Same trust-cue instinct as "AI-drafted, review before publishing," applied to cost instead of content.</p>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="principle">
-      <span class="n">02</span>
-      <div>
-        <h3>Regenerating a section should never feel like starting over.</h3>
-        <p>Section-level control, not full-layout reshuffles. If editing the hero also shifts the pricing table, people stop trusting the regenerate button — and that button is the product.</p>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- TOKEN ECONOMICS -->
+  <section>
+    <div class="wrap section-inner">
+      <span class="eyebrow">02 — Token economics</span>
+      <h2>Five levers, in the order they pay for themselves</h2>
+      <p class="lede">Case studies stacking all five report 60–90% cost reduction with no measured quality loss. This isn't "use a cheaper model" — it's an engineering discipline with its own tooling market.</p>
+    </div>
+    <div class="wide-inner">
+      <div class="levers">
+        <div class="lever-row">
+          <span class="n">1</span>
+          <div><h4>Prompt caching</h4><p>Cache the stable parts of a prompt — system instructions, the brand/style guide, the page's existing structure — so a small edit only bills for what actually changed.</p></div>
+          <span class="save">~90% off cached input (Anthropic) · ~50% (OpenAI)</span>
+        </div>
+        <div class="lever-row">
+          <span class="n">2</span>
+          <div><h4>Model routing / cascading</h4><p>Try a cheap, fast model first for routine work; escalate to a frontier model only when the task actually needs it. A common split is roughly 70% cheap / 20% mid / 10% frontier.</p></div>
+          <span class="save">60–80% cost reduction</span>
+        </div>
+        <div class="lever-row">
+          <span class="n">3</span>
+          <div><h4>Context engineering</h4><p>Every token sent is billed, including the ones that don't help. Summarize prior state instead of replaying full history; don't resend the whole page for a one-line copy edit.</p></div>
+          <span class="save">40–60% of typical agent spend is low-value context</span>
+        </div>
+        <div class="lever-row">
+          <span class="n">4</span>
+          <div><h4>Output length control</h4><p>Ask for a patch, not a rewrite — structured diffs or JSON instead of "regenerate the whole file." Output tokens cost several times more than input tokens on nearly every provider, so this lever moves cost disproportionately.</p></div>
+          <span class="save">output tokens ≈ 4–8× input price, most providers</span>
+        </div>
+        <div class="lever-row">
+          <span class="n">5</span>
+          <div><h4>Monitoring &amp; attribution</h4><p>Track cost per generation type so credit pricing can be set honestly — the direct fix for Lovable's "I can't predict my bill" complaint. Tooling lanes: AI gateways (Portkey, Helicone, LiteLLM), auto-routers (OpenRouter, Not Diamond), and observability/semantic caching (Langfuse, GPTCache).</p></div>
+          <span class="save">makes the other four measurable</span>
+        </div>
       </div>
     </div>
-    <div class="principle">
-      <span class="n">03</span>
-      <div>
-        <h3>AI confidence should never outrun AI accuracy.</h3>
-        <p>Factual fields — hours, pricing, credentials — need a visible review-before-publish state. Confident, wrong, and public is the failure that costs a real business a real customer.</p>
-        <span class="demo-note">The workbench above demonstrates this: every draft carries a review-before-publishing badge.</span>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- LLM LANDSCAPE -->
+  <section>
+    <div class="wrap section-inner">
+      <span class="eyebrow">03 — The full model landscape</span>
+      <h2>Every candidate worth knowing about</h2>
+      <p class="lede">Grouped by tier, not by preference. Filter by tag to narrow the list — nothing here is pre-selected.</p>
+    </div>
+    <div class="wide-inner">
+      <div class="note"><b>On these numbers:</b> pulled from third-party rate-tracking sites in September 2026, not each provider's own pricing page — a few figures conflicted across sources and are marked <span class="flag">†</span> with "confirm" in the notes. Treat as directional for comparison, verify before committing real budget math. Open-weight models don't have one fixed price — cost depends on which inference host runs them, or your own GPU cost if self-hosted.</div>
+
+      <div class="filters" id="filters">
+        <button class="chip" data-tag="all">All</button>
+        <button class="chip" data-tag="frontier">Frontier</button>
+        <button class="chip" data-tag="mid">Balanced / mid</button>
+        <button class="chip" data-tag="cheap">Small &amp; cheap</button>
+        <button class="chip" data-tag="coding">Coding-specialized</button>
+        <button class="chip" data-tag="open">Open-weight</button>
+        <button class="chip" data-tag="multimodal">Multimodal</button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="llm-table">
+          <thead>
+            <tr><th>Model</th><th>Provider</th><th>Input $/M</th><th>Output $/M</th><th>Context</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr class="tier-row"><td colspan="6">Frontier</td></tr>
+            <tr data-tags="frontier coding multimodal"><td class="model">Claude Fable 5.1</td><td class="provider">Anthropic</td><td class="num">†</td><td class="num">†</td><td class="num">—</td><td>Adaptive-reasoning flagship; leads the reported coding index (81.6). Pricing not published in this pass — confirm with Anthropic.<span class="tag">frontier</span><span class="tag">coding</span></td></tr>
+            <tr data-tags="frontier multimodal"><td class="model">Claude Opus 5</td><td class="provider">Anthropic</td><td class="num">$5.00</td><td class="num">$25.00</td><td class="num">200K</td><td>Figure conflicts with an older Opus-tier quote (~$15 in) elsewhere — confirm current rate.<span class="flag">†</span><span class="tag">frontier</span></td></tr>
+            <tr data-tags="frontier multimodal"><td class="model">GPT-6 Astra</td><td class="provider">OpenAI</td><td class="num">$10.00</td><td class="num">$50.00</td><td class="num">—</td><td>Newest OpenAI flagship, released Sept 3, 2026.<span class="tag">frontier</span></td></tr>
+            <tr data-tags="frontier multimodal"><td class="model">GPT-5.5</td><td class="provider">OpenAI</td><td class="num">$5.00</td><td class="num">$30.00</td><td class="num">—</td><td>Prior-gen flagship, still in the lineup below GPT-6 Astra.<span class="tag">frontier</span></td></tr>
+            <tr data-tags="frontier multimodal"><td class="model">Gemini 3.1 Pro</td><td class="provider">Google</td><td class="num">$2.00</td><td class="num">$12.00</td><td class="num">200K+</td><td>Rate doubles ($4/$18) past 200K context — a real cliff for long documents.<span class="tag">frontier</span><span class="tag">multimodal</span></td></tr>
+            <tr data-tags="frontier"><td class="model">Grok 4.5 / 4.3</td><td class="provider">xAI</td><td class="num">†</td><td class="num">†</td><td class="num">—</td><td>Both also double past a long-context threshold; base rate not confirmed in this pass.<span class="flag">†</span><span class="tag">frontier</span></td></tr>
+            <tr data-tags="frontier coding open"><td class="model">DeepSeek V4-Pro</td><td class="provider">DeepSeek</td><td class="num">†</td><td class="num">†</td><td class="num">—</td><td>Sparse MoE, 1.6T total / 49B active params. Pricing not confirmed in this pass.<span class="tag">frontier</span><span class="tag">open-weight</span></td></tr>
+            <tr data-tags="frontier coding"><td class="model">DeepSeek V3.2</td><td class="provider">DeepSeek</td><td class="num">†</td><td class="num">†</td><td class="num">—</td><td>Called out specifically for competitive coding, long-context, tool-integrated use.<span class="tag">coding</span></td></tr>
+            <tr data-tags="frontier open"><td class="model">Mistral Large 3</td><td class="provider">Mistral</td><td class="num">†</td><td class="num">†</td><td class="num">—</td><td>Sparse MoE, 675B total / 41B active. Pricing not confirmed.<span class="tag">open-weight</span></td></tr>
+            <tr data-tags="frontier open"><td class="model">Qwen3 235B-A22B</td><td class="provider">Alibaba</td><td class="num">host-dep.</td><td class="num">host-dep.</td><td class="num">—</td><td>MoE, 235B total / 22B active. Open-weight — price depends on inference host.<span class="tag">open-weight</span></td></tr>
+
+            <tr class="tier-row"><td colspan="6">Balanced / mid-tier</td></tr>
+            <tr data-tags="mid multimodal"><td class="model">Claude Sonnet 5</td><td class="provider">Anthropic</td><td class="num">$2.00</td><td class="num">$10.00</td><td class="num">200K</td><td>Good default for the "plan" step — strong reasoning without frontier pricing.<span class="tag">mid</span></td></tr>
+            <tr data-tags="mid multimodal"><td class="model">Gemini 3 Flash</td><td class="provider">Google</td><td class="num">$0.50</td><td class="num">$3.00</td><td class="num">—</td><td>Google's budget-friendly mid tier.<span class="tag">mid</span></td></tr>
+            <tr data-tags="mid coding"><td class="model">Kimi K2.7 Code</td><td class="provider">Moonshot</td><td class="num">$0.74</td><td class="num">$3.50</td><td class="num">262K</td><td>Coding-dedicated product line, long context.<span class="tag">coding</span></td></tr>
+            <tr data-tags="mid"><td class="model">Command A</td><td class="provider">Cohere</td><td class="num">$2.50</td><td class="num">$10.00</td><td class="num">—</td><td>Cohere's flagship tier.<span class="tag">mid</span></td></tr>
+            <tr data-tags="mid open"><td class="model">Llama 4 Maverick</td><td class="provider">Meta</td><td class="num">host-dep.</td><td class="num">host-dep.</td><td class="num">—</td><td>Sparse MoE, 400B total / 17B active. Open-weight.<span class="tag">open-weight</span></td></tr>
+
+            <tr class="tier-row"><td colspan="6">Small &amp; cheap — high-volume, routine tasks</td></tr>
+            <tr data-tags="cheap"><td class="model">Claude Haiku 4.5</td><td class="provider">Anthropic</td><td class="num">$1.00</td><td class="num">$5.00</td><td class="num">200K</td><td>Matches Sonnet 4 on coding/agent tasks at a fraction of the cost — a strong default for per-section fill work.<span class="tag">cheap</span></td></tr>
+            <tr data-tags="cheap"><td class="model">GPT-5 Mini</td><td class="provider">OpenAI</td><td class="num">$0.25</td><td class="num">$2.00</td><td class="num">—</td><td><span class="tag">cheap</span></td></tr>
+            <tr data-tags="cheap"><td class="model">GPT-5 Nano</td><td class="provider">OpenAI</td><td class="num">$0.05</td><td class="num">$0.40</td><td class="num">—</td><td>Cheapest model OpenAI lists publicly.<span class="tag">cheap</span></td></tr>
+            <tr data-tags="cheap"><td class="model">DeepSeek V4-Flash</td><td class="provider">DeepSeek</td><td class="num">$0.14</td><td class="num">$0.28</td><td class="num">—</td><td>Cheapest listed API found in this research (Aug 2026).<span class="tag">cheap</span></td></tr>
+            <tr data-tags="cheap"><td class="model">Command R (08-2024)</td><td class="provider">Cohere</td><td class="num">$0.15</td><td class="num">$0.60</td><td class="num">—</td><td><span class="tag">cheap</span></td></tr>
+            <tr data-tags="cheap"><td class="model">Command R7B</td><td class="provider">Cohere</td><td class="num">$0.0375</td><td class="num">$0.15</td><td class="num">—</td><td>Smallest Command tier — extremely cheap for simple classification work.<span class="tag">cheap</span></td></tr>
+            <tr data-tags="cheap"><td class="model">Grok 4.1</td><td class="provider">xAI</td><td class="num">$0.20</td><td class="num">$0.50</td><td class="num">—</td><td><span class="tag">cheap</span></td></tr>
+            <tr data-tags="cheap open"><td class="model">Llama 4 Scout</td><td class="provider">Meta</td><td class="num">host-dep.</td><td class="num">host-dep.</td><td class="num">—</td><td>Smaller MoE than Maverick, open-weight.<span class="tag">open-weight</span></td></tr>
+            <tr data-tags="cheap open"><td class="model">Ministral 8B</td><td class="provider">Mistral</td><td class="num">host-dep.</td><td class="num">host-dep.</td><td class="num">—</td><td>Roughly on par with GLM-4.7 Flash on simple tasks.<span class="tag">open-weight</span></td></tr>
+            <tr data-tags="cheap open"><td class="model">GLM-4.7 Flash</td><td class="provider">Z.ai</td><td class="num">host-dep.</td><td class="num">host-dep.</td><td class="num">—</td><td>Open-weight, competitive small/efficient tier.<span class="tag">open-weight</span></td></tr>
+            <tr data-tags="cheap open"><td class="model">Phi-4</td><td class="provider">Microsoft</td><td class="num">host-dep.</td><td class="num">host-dep.</td><td class="num">—</td><td>Built for small-scale/edge deployment — near-zero marginal cost if self-hosted or run on-device.<span class="tag">open-weight</span></td></tr>
+            <tr data-tags="cheap"><td class="model">Nova family (Micro/Lite/Pro/Premier)</td><td class="provider">Amazon</td><td class="num">†</td><td class="num">†</td><td class="num">—</td><td>Not confirmed in this pass — check AWS Bedrock pricing directly if IONOS infra touches AWS.<span class="flag">†</span></td></tr>
+
+            <tr class="tier-row"><td colspan="6">Coding-specialized</td></tr>
+            <tr data-tags="coding"><td class="model">Codestral</td><td class="provider">Mistral</td><td class="num">$0.30</td><td class="num">$0.90</td><td class="num">—</td><td>FIM completions and chat-based code generation.<span class="tag">coding</span></td></tr>
+            <tr data-tags="coding"><td class="model">Codex line</td><td class="provider">OpenAI</td><td class="num">†</td><td class="num">†</td><td class="num">—</td><td>Dedicated coding models; pricing tied to underlying GPT tier, not separately confirmed.<span class="flag">†</span><span class="tag">coding</span></td></tr>
+            <tr data-tags="coding open"><td class="model">Qwen3 Coder</td><td class="provider">Alibaba</td><td class="num">host-dep.</td><td class="num">host-dep.</td><td class="num">—</td><td>Open-weight coding line.<span class="tag">coding</span><span class="tag">open-weight</span></td></tr>
+            <tr data-tags="coding"><td class="model">Devstral</td><td class="provider">Mistral</td><td class="num">†</td><td class="num">†</td><td class="num">—</td><td>Coding-agent-focused; pricing not confirmed in this pass.<span class="flag">†</span><span class="tag">coding</span></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    <div class="principle">
-      <span class="n">04</span>
-      <div>
-        <h3>Great defaults, real editing underneath.</h3>
-        <p>The generated page should be good enough to ship untouched — and every part of it editable when someone wants to. Defaults are a starting point, never a cage.</p>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- FEATURE MAP -->
+  <section>
+    <div class="wrap section-inner">
+      <span class="eyebrow">04 — Where each model could actually fit</span>
+      <h2>Candidates per feature, not a decision</h2>
+      <span class="fm-note">Shortlist only — pick nothing yet</span>
+      <p class="lede">If the builder runs on a plan-then-fill architecture, each step has different requirements — no reason to pay frontier prices for a step a $0.05-input model can handle.</p>
+    </div>
+    <div class="wide-inner">
+      <div class="table-wrap">
+        <table class="fmtable">
+          <thead><tr><th>Feature / step</th><th>What it actually needs</th><th>Candidates, cheap → frontier</th></tr></thead>
+          <tbody>
+            <tr><td class="model">Brief parsing &amp; category routing</td><td>Fast, cheap, simple classification</td><td class="candidates"><b>Command R7B</b> → GPT-5 Nano → Claude Haiku 4.5 → DeepSeek V4-Flash</td></tr>
+            <tr><td class="model">Layout / plan drafting ("plan" step)</td><td>Structured reasoning, doesn't need frontier</td><td class="candidates"><b>Gemini 3 Flash</b> → Claude Sonnet 5 → Kimi K2.7 Code → Qwen3 235B</td></tr>
+            <tr><td class="model">Section copy drafting ("fill" step, run per section)</td><td>Solid writing quality, cheap enough to call many times per page</td><td class="candidates"><b>Claude Haiku 4.5</b> → GPT-5 Mini → Llama 4 Maverick → Mistral Large 3</td></tr>
+            <tr><td class="model">Code / component generation (App features — booking, dashboards)</td><td>Strong coding + tool use, worth paying more for</td><td class="candidates"><b>DeepSeek V3.2</b> → Kimi K2.7 Code → Qwen3 Coder → Codestral → Claude Fable 5.1</td></tr>
+            <tr><td class="model">Chat-based edit requests (targeted regeneration)</td><td>Fast, cheap, good at diffs — not full rewrites</td><td class="candidates"><b>Claude Haiku 4.5</b> → GPT-5 Mini → Grok 4.1</td></tr>
+            <tr><td class="model">Screenshot / image-to-spec understanding</td><td>Genuinely multimodal</td><td class="candidates"><b>Gemini 3.1 Pro</b> → GPT-5.5 → Claude Opus 5 / Fable 5.1</td></tr>
+            <tr><td class="model">Factual-claim / quality flagging before publish</td><td>Cheap, reliable structured classification — no creativity needed</td><td class="candidates"><b>Command R7B</b> → GPT-5 Nano → Claude Haiku 4.5</td></tr>
+          </tbody>
+        </table>
       </div>
+      <p style="color:var(--soft-ink);font-size:.88rem">That last row is the "AI-drafted — review before publishing" cue from the work sample, made concrete: it's a cheap classification call, not a creative-writing one — no reason to spend frontier money confirming whether a phone number looks like a phone number.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-<hr class="rule" />
-
-<!-- ROADMAP -->
-<section class="section" id="roadmap">
-  <span class="eyebrow">Roadmap</span>
-  <h2>Prove the loop, then earn the right to expand it.</h2>
-  <p class="section-lead">Sequenced so that trust and control land before growth — a bigger funnel into a product people don't trust just scales the churn.</p>
-  <div class="timeline">
-    <div class="phase">
-      <span class="ph">Phase 0</span>
-      <h3>Prove the loop</h3>
-      <p>One template family, one path: prompt in, one live page out. Tone quality checked by hand on every generation while we learn what "good" sounds like.</p>
-      <div class="krs">
-        <span class="kr">1 template family</span>
-        <span class="kr">prompt → 1 live page</span>
-        <span class="kr">publish rate = north star</span>
-      </div>
+  <footer>
+    <div class="wrap">
+      <h4>Sources</h4>
+      <ol>
+        <li><a href="https://www.eesel.ai/blog/lovable-review" target="_blank" rel="noopener">Lovable review 2026 — eesel AI</a></li>
+        <li><a href="https://flowstep.ai/blog/lovable-reviews/" target="_blank" rel="noopener">Lovable Review &amp; Pricing — Flowstep</a></li>
+        <li><a href="https://dev.to/momen_hq/the-hidden-costs-of-vibe-coding-a-practical-look-at-lovables-credit-usage-3cec" target="_blank" rel="noopener">The hidden costs of vibe coding — DEV Community</a></li>
+        <li><a href="https://intuitionlabs.ai/articles/ai-api-pricing-comparison-grok-gemini-openai-claude" target="_blank" rel="noopener">AI API Pricing Comparison 2026 — IntuitionLabs</a></li>
+        <li><a href="https://www.spheron.network/blog/llm-api-pricing-comparison-gpt-claude-gemini-deepseek-2026/" target="_blank" rel="noopener">LLM API Pricing 2026 — Spheron</a></li>
+        <li><a href="https://www.cloudzero.com/blog/openai-pricing/" target="_blank" rel="noopener">OpenAI API pricing in 2026 — CloudZero</a></li>
+        <li><a href="https://www.eesel.ai/blog/cohere-ai-pricing" target="_blank" rel="noopener">Cohere AI pricing 2026 — eesel AI</a></li>
+        <li><a href="https://www.cloudzero.com/blog/mistral-api-pricing/" target="_blank" rel="noopener">Mistral API Pricing 2026 — CloudZero</a></li>
+        <li><a href="https://llm-stats.com/models/kimi-k2.7-code" target="_blank" rel="noopener">Kimi K2.7 Code — llm-stats.com</a></li>
+        <li><a href="https://kairntech.com/blog/articles/top-open-source-llm-models-in-2026/" target="_blank" rel="noopener">Top Open-Source LLMs 2026 — Kairntech</a></li>
+        <li><a href="https://www.edenai.co/post/best-llms-for-coding" target="_blank" rel="noopener">Best LLMs for Coding 2026 — Eden AI</a></li>
+        <li><a href="https://neuraltrust.ai/blog/ai-token-optimization-guide" target="_blank" rel="noopener">AI Token Optimization Guide — NeuralTrust</a></li>
+        <li><a href="https://www.truefoundry.com/blog/ai-cost-optimization-strategies" target="_blank" rel="noopener">AI Cost Optimization Strategies 2026 — TrueFoundry</a></li>
+        <li><a href="https://www.obviousworks.ch/en/token-optimization-saves-up-to-80-percent-llm-costs/" target="_blank" rel="noopener">Token optimization: saving up to 80% — Obvious Works</a></li>
+        <li><a href="https://www.anthropic.com/news/claude-haiku-4-5" target="_blank" rel="noopener">Introducing Claude Haiku 4.5 — Anthropic</a></li>
+      </ol>
+      <p>Pulled together for Shanelle's IONOS AI App &amp; Sitebuilder prep. Desk research, not verified line-by-line against every provider's own pricing page — re-check anything you're about to put in front of someone.</p>
     </div>
-    <div class="phase">
-      <span class="ph">Phase 1</span>
-      <h3>Expand coverage</h3>
-      <p>Enough industry range that most visitors see something that fits, plus the first real editing affordance: regenerate one section at a time.</p>
-      <div class="krs">
-        <span class="kr">8–10 industry templates</span>
-        <span class="kr">brand kit from uploaded logo</span>
-        <span class="kr">section-level regeneration</span>
-      </div>
-    </div>
-    <div class="phase">
-      <span class="ph">Phase 2</span>
-      <h3>Earn trust &amp; control</h3>
-      <p>Make editing an AI draft feel safe. Nothing gets silently overwritten; nothing ships that fails a basic quality bar.</p>
-      <div class="krs">
-        <span class="kr">inline editing</span>
-        <span class="kr">undo history</span>
-        <span class="kr">pre-publish a11y / SEO checks</span>
-      </div>
-    </div>
-    <div class="phase">
-      <span class="ph">Phase 3</span>
-      <h3>Growth loop</h3>
-      <p>Turn published sites into the acquisition channel — real domains, real analytics, and a gallery that shows the range of what people actually built.</p>
-      <div class="krs">
-        <span class="kr">custom domains</span>
-        <span class="kr">owner-facing analytics</span>
-        <span class="kr">remix gallery of real sites</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="rule" />
-
-<!-- EXECUTION / DECISIONS -->
-<section class="section" id="execution">
-  <span class="eyebrow">How I'd run it</span>
-  <h2>The decisions I see coming — and how I'd <span class="i">approach</span> them.</h2>
-  <p class="section-lead">Four forks the PM of this team hits in the first two quarters. For each one: the options on the table, where I'd land and why, how we'd know it's working, and what would make me reverse it. Click any option to compare.</p>
-  <div class="decisions" id="decisions"></div>
-</section>
-
-<hr class="rule" />
-
-<!-- METRICS -->
-<section class="section" id="metrics">
-  <span class="eyebrow">Target metrics I'd watch from day one</span>
-  <h2>Five numbers that tell you if the loop is working.</h2>
-  <p class="kpi-note">Illustrative targets to instrument and steer toward — not live data from a running product.</p>
-  <div class="kpis">
-    <div class="kpi">
-      <span class="label">Time to first publish</span>
-      <span class="val">&lt;5 min</span>
-      <span class="hint">Prompt to a live URL, first session.</span>
-    </div>
-    <div class="kpi">
-      <span class="label">Activation rate</span>
-      <span class="val">≥55%</span>
-      <span class="hint">Signups who publish at least one page.</span>
-    </div>
-    <div class="kpi">
-      <span class="label">Edit-to-publish ratio</span>
-      <span class="val">&lt;3</span>
-      <span class="hint">Edits needed before someone ships. Lower = better defaults.</span>
-    </div>
-    <div class="kpi">
-      <span class="label">Regeneration rate</span>
-      <span class="val">&lt;20%</span>
-      <span class="hint">Sections regenerated. A quality-miss signal, not engagement.</span>
-    </div>
-    <div class="kpi">
-      <span class="label">Day-7 return rate</span>
-      <span class="val">≥30%</span>
-      <span class="hint">Owners back within a week to edit or extend.</span>
-    </div>
-  </div>
-</section>
-
-<hr class="rule" />
-
-<!-- LANDSCAPE -->
-<section class="section" id="landscape">
-  <span class="eyebrow">Competitive landscape</span>
-  <h2>Everyone can generate. Few make editing the draft feel safe.</h2>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr><th>Approach</th><th>Strength</th><th>Where the gap is</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Wix ADI / Squarespace Blueprint</td>
-          <td>Mature, deep editor once you're in; huge component libraries.</td>
-          <td>Still template-bound — the AI picks a template, it doesn't change what a site can be.</td>
-        </tr>
-        <tr>
-          <td>Framer AI / Durable</td>
-          <td>Fast, AI-first generation; a live site in under a minute.</td>
-          <td>Editing after the fact is thin — you regenerate or you fight the canvas.</td>
-        </tr>
-        <tr>
-          <td>10Web / Dorik AI</td>
-          <td>Real power underneath via WordPress and full builders.</td>
-          <td>That power comes back as complexity — the first-ten-minutes problem returns.</td>
-        </tr>
-        <tr class="opp">
-          <td>The opportunity</td>
-          <td>Not a smarter generator — a safer one.</td>
-          <td>Make regeneration feel <em>safe</em>, so editing an AI draft feels like refining, not gambling.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<hr class="rule" />
-
-<!-- RISKS -->
-<section class="section" id="risks">
-  <span class="eyebrow">Risks I'd de-risk early</span>
-  <h2>The failure modes that don't announce themselves.</h2>
-  <div class="risks">
-    <div class="risk">
-      <div class="r">Hallucinated business claims — invented hours, prices, awards, or credentials published as fact.</div>
-      <div class="m">Flag every factual field for explicit confirmation before publish; never let a generated claim ship unreviewed.</div>
-    </div>
-    <div class="risk">
-      <div class="r">Sameness at scale — thousands of AI sites converging on three layouts and one voice.</div>
-      <div class="m">Track template and layout diversity per category as a product health metric, with alerts when it collapses.</div>
-    </div>
-    <div class="risk">
-      <div class="r">Accessibility and SEO regressions — generated markup that looks fine and scores badly.</div>
-      <div class="m">Automated pre-publish audit (contrast, headings, alt text, meta, structured data) that blocks or warns before going live.</div>
-    </div>
-    <div class="risk">
-      <div class="r">Trust erosion from silent overwrites — a regenerate wipes an edit someone spent time on.</div>
-      <div class="m">Undo history from day one, not a v3 feature. Every regenerate is reversible and visibly so.</div>
-    </div>
-  </div>
-</section>
-
-<hr class="rule" />
-
-<!-- CLOSING -->
-<section class="section closing" id="contact">
-  <span class="eyebrow">Closing note</span>
-  <h2>Why a demo instead of a follow-up email.</h2>
-  <p>A status-check email tells you I'm still interested. A working version of the core loop — instrumented, with the trust cues built in — tells you how I'd actually approach the role: start from the user's first ten minutes, make the risky part safe, and measure whether it's working. That felt like the more honest thing to send.</p>
-  <div class="contact">
-    <div class="who">Shanelle Llamido</div>
-    <div class="re">Re: Following up on the Product Manager, AI Department application</div>
-    <a class="mail" href="mailto:shanelle.llamido@gmail.com?subject=Product%20Manager%2C%20AI%20Department%20—%20follow-up">Email shanelle.llamido@gmail.com</a>
-  </div>
-</section>
-
-<footer class="disc">
-  <div class="section">
-    <p>Disclosure: this generator runs entirely in your browser. It simulates the describe-your-business → published-site loop with a rule-based engine and is not connected to a live AI model. No data leaves the page; the only network request is the Google Fonts stylesheet.</p>
-  </div>
-</footer>
+  </footer>
+</main>
 
 <script>
 (function(){
-  "use strict";
-
-  var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---------- category engine ---------- */
-  var CATEGORIES = [
-    {
-      key:'bakery/cafe',
-      keywords:['bakery','bake','coffee','cafe','café','pastry','bread','roastery','patisserie'],
-      colors:{primary:'#B0562B',secondary:'#F6E8D8',ink:'#3B2A1E'},
-      heading:"'Playfair Display', Georgia, serif",
-      body:"'Poppins', system-ui, sans-serif",
-      fallbackName:'Flour & Ember',
-      cta:"See this week's roast",
-      tagline:'Where [name] turns single-origin beans and slow mornings into your new daily ritual.',
-      about:'[name] started at a single cart with one grinder and a stubborn belief that a morning coffee is worth doing properly. Today we roast in small batches every week and bake before sunrise, a block from where you are standing.',
-      features:['Single-origin beans roasted in-house every week','Pastries baked from scratch before the doors open','A counter built for regulars, not for rushing'],
-      quote:{q:'I came in for a flat white and somehow joined a community.',a:'Dana R., regular since week one'}
-    },
-    {
-      key:'photography',
-      keywords:['photo','photography','photographer','portrait','wedding photo'],
-      colors:{primary:'#1C1C1C',secondary:'#EFE9DE',ink:'#1C1C1C'},
-      heading:"'Cormorant Garamond', Georgia, serif",
-      body:"'Nunito Sans', system-ui, sans-serif",
-      fallbackName:'Field & Frame',
-      cta:"Check your date",
-      tagline:'[name] documents the days you will want to live inside again — unposed, unhurried, honestly yours.',
-      about:'[name] is a small studio that photographs weddings and portraits the way they actually feel: a little chaotic, deeply specific, over too fast. We shoot quietly, edit by hand, and deliver galleries you will still open in ten years.',
-      features:['Full-day coverage with a second shooter included','Hand-edited galleries delivered within three weeks','Print-ready files and an optional album design service'],
-      quote:{q:'She caught the second my dad turned away to wipe his eyes. That is the photo we framed.',a:'Priya & Marcus'}
-    },
-    {
-      key:'fitness',
-      keywords:['gym','fitness','coach','training','crossfit','yoga','pilates','workout'],
-      colors:{primary:'#D6482B',secondary:'#14181C',ink:'#F3F4F6'},
-      heading:"'Oswald', 'Arial Narrow', sans-serif",
-      body:"'Work Sans', system-ui, sans-serif",
-      fallbackName:'Northside Strength',
-      cta:"Book a free session",
-      tagline:'[name] is coaching built around your week, your body, and the goal you actually care about.',
-      about:'[name] is a coaching gym, not a machine room. Every member gets a program that adapts when work gets loud, coaches who remember your last session, and a room where the beginner and the competitor train side by side.',
-      features:['Small-group sessions capped at eight people','Programming that adjusts when life gets in the way','Coaches who know your name and your numbers'],
-      quote:{q:'First gym where nobody made me feel like the beginner I obviously was.',a:'Alex T., member two years running'}
-    },
-    {
-      key:'consulting/legal',
-      keywords:['consult','consulting','agency','law','legal','firm','advisory'],
-      colors:{primary:'#1B2A4A',secondary:'#EDEFF3',ink:'#1B2A4A'},
-      heading:"'Lora', Georgia, serif",
-      body:"'Work Sans', system-ui, sans-serif",
-      fallbackName:'Meridian Advisory',
-      cta:"Request a consult",
-      tagline:'[name] gives founders and families straight answers on the decisions that do not come with a redo.',
-      about:'[name] is a small practice built on a simple promise: you talk to a principal, not a queue, and you leave every conversation knowing exactly where you stand. Fixed fees, plain language, no surprise invoices.',
-      features:['Fixed-fee engagements with no surprise billing','Direct access to a partner, not an intake desk','Plain-language summaries alongside the fine print'],
-      quote:{q:'They told me the deal was not worth doing. That advice paid for itself ten times over.',a:'Founder, Series A logistics company'}
-    },
-    {
-      key:'restaurant',
-      keywords:['restaurant','bistro','kitchen','dining','chef','eatery'],
-      colors:{primary:'#8C2F2F',secondary:'#F4ECE1',ink:'#3A211B'},
-      heading:"'Abril Fatface', Georgia, serif",
-      body:"'Nunito Sans', system-ui, sans-serif",
-      fallbackName:'The Copper Table',
-      cta:"Reserve a table",
-      tagline:'[name] serves a short menu of seasonal plates in a room that sounds like a good night out.',
-      about:'[name] is a neighborhood restaurant with a menu that gets rewritten around whatever the market has that week. The wine list rewards curiosity over budget, and the bar keeps a few seats open for walk-ins until close.',
-      features:['Menu built around what the market has that week','A wine list that rewards curiosity over budget','Walk-ins welcome at the bar until close'],
-      quote:{q:'We booked for an anniversary and ended up back twice more that month.',a:'Elena V.'}
-    },
-    {
-      key:'salon/beauty',
-      keywords:['salon','beauty','spa','hair','nails','skincare','curls','color'],
-      colors:{primary:'#B5657A',secondary:'#FBF3F0',ink:'#5A2C38'},
-      heading:"'Quicksand', system-ui, sans-serif",
-      body:"'Poppins', system-ui, sans-serif",
-      fallbackName:'Studio Lumière',
-      cta:"Book an appointment",
-      tagline:'[name] is the chair where color, cut, and honest advice finally live in the same place.',
-      about:'[name] is a studio that starts every appointment with a real consultation — what your hair actually does, what you can maintain, what will photograph the way you want. Then we cut. Color correction is our specialty, not our warning label.',
-      features:['Consultations that begin before the scissors do','Color correction from stylists who specialize in it','Products matched to your hair, not the retail shelf'],
-      quote:{q:'I brought in a screenshot and walked out with hair that actually matched it.',a:'Mara K.'}
-    },
-    {
-      key:'tech/SaaS',
-      keywords:['startup','saas','app','software','tech','platform','onboarding'],
-      colors:{primary:'#2B4C7E',secondary:'#0F1620',ink:'#E7ECF2'},
-      heading:"'Sora', system-ui, sans-serif",
-      body:"'Manrope', system-ui, sans-serif",
-      fallbackName:'Cadence',
-      cta:"Start a demo",
-      tagline:'[name] turns messy customer onboarding into a repeatable path your whole team can see.',
-      about:'[name] gives customer success and sales one shared view of every new account — where they are, what is blocking them, and what happens next. Guided flows adapt to each plan, so the fifty-person rollout runs like the five-person one.',
-      features:['Guided flows that adapt to each account plan','Milestone tracking shared across CS and sales','Integrations with the tools your customers already run'],
-      quote:{q:'Time-to-value dropped by a third in our first quarter on it.',a:'VP Customer Success, mid-market fintech'}
-    },
-    {
-      key:'nonprofit',
-      keywords:['nonprofit','non-profit','charity','foundation','community','mentorship','mentor'],
-      colors:{primary:'#2E5339',secondary:'#F1F0E6',ink:'#2E5339'},
-      heading:"'DM Serif Display', Georgia, serif",
-      body:"'Work Sans', system-ui, sans-serif",
-      fallbackName:'The Bridgework Fund',
-      cta:"Become a mentor",
-      tagline:'[name] pairs young people with mentors who stay in the picture long after the first meeting.',
-      about:'[name] runs year-long mentorship matches, weekly programming after school and through the summer, and a promise to every donor: each dollar is tracked to a student outcome you can actually read about.',
-      features:['Mentor matches built to last a full year, minimum','Weekly programming after school and over the summer','Every dollar tracked to a specific student outcome'],
-      quote:{q:'My mentor was the first adult who asked what I wanted, then helped me get there.',a:'Jordan, program alum and now a mentor'}
-    },
-    {
-      key:'default',
-      keywords:[],
-      colors:{primary:'#3D5A80',secondary:'#EDEFF3',ink:'#1B2733'},
-      heading:"'Fraunces', Georgia, serif",
-      body:"'Work Sans', system-ui, sans-serif",
-      fallbackName:'Halyard & Co.',
-      cta:"Start a conversation",
-      tagline:'[name] brings a clearer point of view to work that too often gets done on autopilot.',
-      about:'[name] is a small, deliberate operation with a focused offering instead of a menu of everything. Clear timelines, clearer communication, and work that reflects the people who actually made it.',
-      features:['A focused offering instead of a list of everything','Clear timelines and clearer communication','Work that reflects the people who made it'],
-      quote:{q:'They asked sharper questions than anyone else we talked to.',a:'A recent client'}
-    }
-  ];
-
-  var TONES = {
-    Minimal:{radius:'0px',weight:500,h1:'1.95rem'},
-    Modern:{radius:'8px',weight:600,h1:'2.05rem'},
-    Bold:{radius:'4px',weight:700,h1:'2.55rem'},
-    Playful:{radius:'18px',weight:600,h1:'2.05rem'}
-  };
-
-  /* ---------- helpers ---------- */
-  function matchCategory(text){
-    var t = (text||'').toLowerCase();
-    for(var i=0;i<CATEGORIES.length;i++){
-      var c = CATEGORIES[i];
-      for(var k=0;k<c.keywords.length;k++){
-        if(t.indexOf(c.keywords[k]) !== -1) return c;
-      }
-    }
-    return CATEGORIES[CATEGORIES.length-1];
-  }
-  function titleCase(s){
-    return s.trim().replace(/\s+/g,' ').split(' ').map(function(w){
-      if(!w) return w;
-      if(w === '&') return '&';
-      return w.charAt(0).toUpperCase() + w.slice(1);
-    }).join(' ');
-  }
-  function kebab(s){
-    return s.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-  }
-  function esc(s){
-    return String(s).replace(/[&<>"']/g,function(m){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
-    });
-  }
-  function pad(n){ return (n<10?'0':'')+n; }
-  function pad3(n){ return (n<100?(n<10?'00':'0'):'')+n; }
-  function ts(){
-    var d = new Date();
-    return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())+'.'+pad3(d.getMilliseconds());
-  }
-  function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-
-  // WCAG relative-luminance contrast
-  function hexRgb(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
-  function relLum(rgb){
-    var a = rgb.map(function(v){ v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); });
-    return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
-  }
-  function contrast(h1,h2){
-    var l1=relLum(hexRgb(h1)), l2=relLum(hexRgb(h2));
-    var hi=Math.max(l1,l2), lo=Math.min(l1,l2);
-    return (hi+0.05)/(lo+0.05);
-  }
-
-  var ICONS = [
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg>',
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-3 6-3-6 3 1z"/></svg>'
-  ];
-
-  /* ---------- DOM ---------- */
-  var input = document.getElementById('promptInput');
-  var btn = document.getElementById('generateBtn');
-  var chipsWrap = document.getElementById('chips');
-  var toneGroup = document.getElementById('toneGroup');
-  var urlBar = document.getElementById('urlBar');
-  var buildEl = document.getElementById('build');
-  var buildList = document.getElementById('buildList');
-  var siteWrap = document.getElementById('siteWrap');
-  var logEl = document.getElementById('log');
-
-  var currentTone = 'Modern';
-  var runId = 0;
-
-  /* ---------- telemetry ---------- */
-  function logLine(kind, ev, payload){
-    var row = document.createElement('span');
-    row.className = 'row';
-    var evClass = kind === 'ok' ? 'ok' : 'ev';
-    row.innerHTML = '<span class="t">'+ts()+'</span> ' +
-      '<span class="'+evClass+'">'+esc(ev)+'</span>' +
-      (payload ? ' <span class="pay">'+esc(payload)+'</span>' : '');
-    logEl.appendChild(row);
-    // cap
-    while(logEl.children.length > 80) logEl.removeChild(logEl.firstChild);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-  function logSys(msg){
-    var row = document.createElement('span');
-    row.className = 'row';
-    row.innerHTML = '<span class="t">'+ts()+'</span> <span class="sys">'+esc(msg)+'</span>';
-    logEl.appendChild(row);
-    while(logEl.children.length > 80) logEl.removeChild(logEl.firstChild);
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-
-  /* ---------- build checklist ---------- */
-  function setStep(idx, state){
-    var li = buildList.querySelector('li[data-step="'+idx+'"]');
-    if(!li) return;
-    li.classList.remove('active','done');
-    var mk = li.querySelector('.mk');
-    if(state === 'active'){ li.classList.add('active'); mk.textContent = '›'; }
-    else if(state === 'done'){ li.classList.add('done'); mk.textContent = '✓'; }
-    else { mk.textContent = '○'; }
-  }
-  function resetSteps(){
-    for(var i=0;i<5;i++) setStep(i,'pending');
-  }
-
-  /* ---------- preview render ---------- */
-  function buildPreviewData(text){
-    var cat = matchCategory(text);
-    var typed = (text||'').trim();
-    var name = typed ? titleCase(typed) : cat.fallbackName;
-    var slug = kebab(name) || 'your-site';
-    var tagline = cat.tagline.replace('[name]', name);
-    var about = cat.about.replace(/\[name\]/g, name);
-    return { cat:cat, name:name, slug:slug, tagline:tagline, about:about };
-  }
-
-  function renderPreview(data, tone){
-    var c = data.cat, t = TONES[tone] || TONES.Modern;
-    var email = 'hello@' + data.slug + '.site';
-    var featuresHtml = c.features.map(function(f,i){
-      return '<li>'+ICONS[i%ICONS.length]+'<span>'+esc(f)+'</span></li>';
-    }).join('');
-
-    var html =
-      '<div class="site" style="'+
-        '--p-primary:'+c.colors.primary+';'+
-        '--p-secondary:'+c.colors.secondary+';'+
-        '--p-ink:'+c.colors.ink+';'+
-        '--p-heading:'+c.heading+';'+
-        '--p-body:'+c.body+';'+
-        '--p-radius:'+t.radius+';'+
-        '--p-weight:'+t.weight+';'+
-        '--p-h1:'+t.h1+';">'+
-        '<div class="site-hero">'+
-          '<span class="ai-badge">AI-drafted — review before publishing</span>'+
-          '<h1>'+esc(data.name)+'</h1>'+
-          '<p class="tagline">'+esc(data.tagline)+'</p>'+
-          '<a class="site-cta" href="#" onclick="return false">'+esc(c.cta)+'</a>'+
-        '</div>'+
-        '<div class="site-section site-about"><h2>About</h2><p>'+esc(data.about)+'</p></div>'+
-        '<div class="site-section site-features"><h2>What you get</h2><ul>'+featuresHtml+'</ul></div>'+
-        '<blockquote class="site-quote"><p>'+esc(c.quote.q)+'</p><cite>— '+esc(c.quote.a)+'</cite></blockquote>'+
-        '<div class="site-foot"><span>© 2026 '+esc(data.name)+'. All rights reserved.</span><span>'+esc(email)+'</span></div>'+
-      '</div>';
-
-    siteWrap.innerHTML = html;
-    return { email:email };
-  }
-
-  function countWords(){
-    var txt = siteWrap.textContent || '';
-    var m = txt.trim().match(/\S+/g);
-    return m ? m.length : 0;
-  }
-
-  /* ---------- generate orchestration ---------- */
-  function generate(opts){
-    opts = opts || {};
-    var myRun = ++runId;
-    var data = buildPreviewData(input.value);
-    var tone = currentTone;
-    var template = data.cat.key.replace(/\//g,'-') + '-v1';
-
-    urlBar.textContent = data.slug + '.site';
-    btn.disabled = true;
-    btn.textContent = 'Generating…';
-
-    resetSteps();
-    buildEl.hidden = false;
-    siteWrap.hidden = true;
-    siteWrap.innerHTML = '';
-
-    if(!opts.silent) logSys('— generate requested —');
-    logLine('ev','brief_submitted', JSON.stringify({category:data.cat.key, tone:tone}));
-
-    var delay = REDUCED ? 60 : 500;
-
-    // Advance the 5-step checklist, emitting the matching telemetry line as each
-    // step begins. Steps: 0 Parsing · 1 Selecting layout · 2 Drafting copy ·
-    // 3 Applying theme · 4 Publishing.
-    function step(i){
-      if(myRun !== runId) return;
-      if(i > 0) setStep(i - 1, 'done');
-
-      if(i === 5){
-        setStep(4, 'done');
-        setTimeout(function(){
-          if(myRun !== runId) return;
-          renderPreview(data, tone);
-          buildEl.hidden = true;
-          siteWrap.hidden = false;
-          logLine('ok','site_published', JSON.stringify({ url:data.slug + '.site', latency_ms:rand(1800,2600) }));
-          btn.disabled = false;
-          btn.textContent = 'Regenerate';
-        }, REDUCED ? 30 : 300);
-        return;
-      }
-
-      setStep(i, 'active');
-      if(i === 2){
-        logLine('ev','layout_selected', JSON.stringify({ template:template, sections:5 }));
-      } else if(i === 3){
-        // render now so the reported word count is the real rendered copy
-        renderPreview(data, tone);
-        logLine('ev','copy_drafted', JSON.stringify({
-          words: countWords(),
-          reading_level: ['Grade 6','Grade 7','Grade 8'][rand(0,2)]
-        }));
-      } else if(i === 4){
-        logLine('ev','theme_applied', JSON.stringify({
-          palette: data.cat.colors.primary,
-          contrast_ratio: contrast(data.cat.colors.ink, data.cat.colors.secondary).toFixed(2) + ':1'
-        }));
-      }
-      setTimeout(function(){ step(i + 1); }, delay);
-    }
-    step(0);
-  }
-
-  /* ---------- events ---------- */
-  btn.addEventListener('click', function(){ generate(); });
-  input.addEventListener('keydown', function(e){
-    if(e.key === 'Enter'){ e.preventDefault(); generate(); }
-  });
-  chipsWrap.addEventListener('click', function(e){
-    var b = e.target.closest('.chip');
-    if(!b) return;
-    input.value = b.textContent.trim();
-    generate();
-  });
-  toneGroup.addEventListener('click', function(e){
-    var b = e.target.closest('button[data-tone]');
-    if(!b) return;
-    currentTone = b.getAttribute('data-tone');
-    Array.prototype.forEach.call(toneGroup.querySelectorAll('button'), function(x){
-      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
-    });
-    // re-style current preview live (styling only)
-    var site = siteWrap.querySelector('.site');
-    if(site){
-      var t = TONES[currentTone];
-      site.style.setProperty('--p-radius', t.radius);
-      site.style.setProperty('--p-weight', t.weight);
-      site.style.setProperty('--p-h1', t.h1);
-      logSys('tone_changed -> ' + currentTone + ' (preview restyled, no regeneration)');
-    }
-  });
-
-  /* ---------- nav active state ---------- */
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.topnav a'));
-  var dotLinks = Array.prototype.slice.call(document.querySelectorAll('.dotnav a'));
-  var navIds = ['demo','approach','roadmap','execution','metrics','landscape','contact'];
-  if('IntersectionObserver' in window){
-    var byId = {};
-    navIds.forEach(function(id){ var el = document.getElementById(id); if(el) byId[id]=el; });
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if(en.isIntersecting){
-          var id = en.target.id;
-          navLinks.forEach(function(a){ a.classList.toggle('is-active', a.getAttribute('href') === '#'+id); });
-          dotLinks.forEach(function(a){ a.classList.toggle('is-active', a.getAttribute('href') === '#'+id); });
-        }
+  var chips = document.querySelectorAll('#filters .chip');
+  var rows = document.querySelectorAll('#llm-table tbody tr[data-tags]');
+  var active = new Set();
+  function apply(){
+    if(active.size === 0){
+      rows.forEach(function(r){ r.classList.remove('hide'); });
+    } else {
+      rows.forEach(function(r){
+        var tags = r.getAttribute('data-tags').split(' ');
+        var match = tags.some(function(t){ return active.has(t); });
+        r.classList.toggle('hide', !match);
       });
-    }, { rootMargin:'-45% 0px -50% 0px', threshold:0 });
-    Object.keys(byId).forEach(function(id){ io.observe(byId[id]); });
-  }
-
-  /* ---------- execution decision cards ---------- */
-  var DECISIONS = [
-    {
-      num:'01',
-      q:'How much of the model do we build ourselves?',
-      pick:2,
-      options:[
-        {label:'Wrap a frontier API', body:'Ships the loop in weeks and gives us the best raw quality available today. The cost is a per-generation price we don’t control and a quality ceiling that moves when someone else’s roadmap moves.'},
-        {label:'Fine-tune an open model', body:'Predictable cost, full control, our data stays ours. But it means standing up an ML training and serving operation before we’ve proven anyone wants the product.'},
-        {label:'Blend the two', body:'Frontier model for the creative draft, where quality is visible; small fine-tuned models for the high-volume mechanical work — layout selection, SEO fields, single-section rewrites.'}
-      ],
-      land:'Start by wrapping a frontier API — the first job is learning what “good” output sounds like, and that needs real users. As the mechanical tasks settle into patterns, move them to small models one at a time. Train nothing until the loop has traction.',
-      validate:'Cost per published site, plus a monthly blind test where the team ranks our output against a fixed frontier baseline. Healthy = quality holds while cost per site trends down.',
-      flip:'If cost per published site won’t clear the free-tier math at scale, or a provider change degrades output we can’t route around — that’s when the open-model investment gets funded.'
-    },
-    {
-      num:'02',
-      q:'What does the editor actually let people do?',
-      pick:2,
-      options:[
-        {label:'Freeform canvas', body:'Highest ceiling, and what the Independent Creator wants. Also a multi-quarter build — and freeform editing of an AI-generated layout is exactly where most of these products feel broken.'},
-        {label:'Fork an open-source builder', body:'The editing problem is mostly solved for free. But we inherit its data model and its UX, and bending someone else’s builder toward AI-native tends to cost more than it saves.'},
-        {label:'Constrained section slots', body:'The page is a stack of typed sections. You can edit content, swap a section’s variant, reorder, or regenerate one section — no absolute positioning.'}
-      ],
-      land:'Constrained slots — not as a compromise, but because it’s the thing that makes regeneration safe. If every section is a defined slot, “regenerate this” can’t break the rest of the page. Freeform is a later conversation, and only if creators ask for it with their feet.',
-      validate:'Edit-to-publish ratio — are people shipping without a fight? — and 4-week retention of the Independent Creator segment specifically.',
-      flip:'If creators consistently churn citing “I can’t make it mine,” add a freeform escape hatch for individual sections — not a full rebuild.'
-    },
-    {
-      num:'03',
-      q:'How does a page actually get generated?',
-      pick:1,
-      options:[
-        {label:'One-shot', body:'Prompt in, whole page out in a single call. Feels magic, lowest latency. But regenerating means re-rolling the whole page, and we can’t explain why it chose what it chose.'},
-        {label:'Plan-then-fill', body:'The model drafts a structure first — which sections, in what order, saying what — then fills each section as its own step.'}
-      ],
-      land:'Plan-then-fill. Slightly slower and a bit more to build, but section-level regeneration, undo, and “why is this section here” all fall out of having an explicit plan. One-shot paints us into a corner the moment someone wants to change one thing.',
-      validate:'Regeneration rate (target under 20%) and post-regenerate undo rate — if people regenerate then immediately undo, the fill step isn’t good enough.',
-      flip:'If first-generation latency can’t feel live, pre-warm the plan and cache aggressively — don’t retreat to one-shot.'
-    },
-    {
-      num:'04',
-      q:'How do we spend Phase 0?',
-      pick:1,
-      options:[
-        {label:'Build wide', body:'Four or five industry templates working roughly, to show range early. Spreads a small team thin and makes the quality bar negotiable.'},
-        {label:'Build one deep', body:'One template family, polished until the output quality genuinely holds. Publish rate is the only number that matters.'},
-        {label:'Instrument first', body:'Week one goes entirely to telemetry and the quality-review process before we generate anything real.'}
-      ],
-      land:'One deep, with a slice of “instrument first” up front. One pod — a designer, two engineers, an applied-AI person, me — on a single family for six weeks. Week one stands up telemetry and a standing Friday review where the team reads real output aloud. No second template until publish rate is real and the Friday review stops finding tone problems.',
-      validate:'Publish rate on the one family, and whether the Friday review’s finding count is trending toward zero.',
-      flip:'If one family can’t hit a quality bar we’d sign our names to in six weeks, the problem is upstream — model or generation approach — and we fix that before adding surface area.'
     }
-  ];
-  var decisionsWrap = document.getElementById('decisions');
-  if(decisionsWrap){
-    DECISIONS.forEach(function(d){
-      var card = document.createElement('article');
-      card.className = 'decision';
-      card.innerHTML =
-        '<span class="decision-num">Decision ' + d.num + '</span>' +
-        '<h3>' + esc(d.q) + '</h3>' +
-        '<div class="opt-row" role="tablist" aria-label="Options for decision ' + d.num + '">' +
-          d.options.map(function(o, oi){
-            return '<button class="opt" type="button" role="tab" aria-selected="false" data-oi="' + oi + '">' +
-              esc(o.label) + (oi === d.pick ? ' <span class="pick">◆ my call</span>' : '') + '</button>';
-          }).join('') +
-        '</div>' +
-        '<p class="decision-detail" data-detail></p>' +
-        '<div class="decision-call"><span class="dl">Where I’d land</span><p>' + esc(d.land) + '</p></div>' +
-        '<div class="decision-foot">' +
-          '<div><span class="dl">How we’d know it’s working</span><p>' + esc(d.validate) + '</p></div>' +
-          '<div><span class="dl">What would flip it</span><p>' + esc(d.flip) + '</p></div>' +
-        '</div>';
-      decisionsWrap.appendChild(card);
-
-      var detail = card.querySelector('[data-detail]');
-      var opts = Array.prototype.slice.call(card.querySelectorAll('.opt'));
-      function select(oi){
-        opts.forEach(function(b, bi){ b.setAttribute('aria-selected', bi === oi ? 'true' : 'false'); });
-        detail.innerHTML = '<strong>' + esc(d.options[oi].label) + '.</strong> ' + esc(d.options[oi].body);
+    var trs = document.querySelectorAll('#llm-table tbody tr');
+    var lastHeader = null, headerHasVisible = false;
+    trs.forEach(function(tr){
+      if(tr.classList.contains('tier-row')){
+        if(lastHeader) lastHeader.classList.toggle('hide', !headerHasVisible);
+        lastHeader = tr; headerHasVisible = false;
+      } else if(!tr.classList.contains('hide')){
+        headerHasVisible = true;
       }
-      opts.forEach(function(b, bi){
-        b.addEventListener('click', function(){ select(bi); });
-        b.addEventListener('keydown', function(e){
-          var dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
-          if(dir){ e.preventDefault(); var t = (bi + dir + opts.length) % opts.length; opts[t].focus(); select(t); }
-        });
-      });
-      select(d.pick);
     });
+    if(lastHeader) lastHeader.classList.toggle('hide', !headerHasVisible);
   }
-
-  /* ---------- init ---------- */
-  input.value = 'artisan coffee roastery';
-  logSys('telemetry stream online · client-side simulation');
-  generate({ silent:true });
-
+  chips.forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var tag = chip.getAttribute('data-tag');
+      if(tag === 'all'){
+        active.clear();
+        chips.forEach(function(c){ c.classList.remove('active'); });
+        chip.classList.add('active');
+      } else {
+        chips[0].classList.remove('active');
+        chip.classList.toggle('active');
+        if(chip.classList.contains('active')) active.add(tag); else active.delete(tag);
+        if(active.size === 0) chips[0].classList.add('active');
+      }
+      apply();
+    });
+  });
+  chips[0].classList.add('active');
 })();
 </script>
 </body>

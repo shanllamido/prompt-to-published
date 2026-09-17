@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How It's Built</title>
+<meta name="description" content="The end-user flow for IONOS's AI App & Sitebuilder, a review of a proposed engineering stack, and a drag-and-drop tool to feel out feature-by-feature model costs." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="style.css" />
+<style>
+/* steps */
+.steps{display:flex;flex-direction:column;gap:1rem;margin:1.6rem 0}
+.step{display:grid;grid-template-columns:3.2rem 1fr;gap:1.2rem;padding:1.3rem 1.4rem}
+.step .sn{
+  width:2.6rem;height:2.6rem;border-radius:50%;background:var(--gradient);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:1.1rem;
+}
+.step h3{margin:.15rem 0 .35rem;font-size:1.08rem}
+.step p{margin:0;color:var(--soft-ink);font-size:.94rem;max-width:60ch}
+.step .badge{
+  display:inline-block;font-family:var(--font-mono);font-size:.63rem;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--violet);background:rgba(140,107,255,.1);border:1px solid rgba(140,107,255,.25);
+  border-radius:999px;padding:.2rem .55rem;margin-bottom:.5rem;
+}
+
+.deliver-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin:1.6rem 0}
+@media (max-width:640px){ .deliver-grid{grid-template-columns:1fr} }
+.deliver{padding:1.3rem 1.4rem}
+.deliver h3{font-size:.94rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.deliver h3 .ic{width:8px;height:8px;border-radius:50%;background:var(--gradient);flex:0 0 auto}
+.deliver p{margin:0;font-size:.88rem;color:var(--soft-ink)}
+
+.qcallout{
+  display:flex;gap:1rem;align-items:flex-start;padding:1.2rem 1.4rem;margin:1.6rem 0;
+}
+.qcallout .q{font-family:var(--font-display);font-size:1.6rem;font-weight:800;background:var(--gradient);-webkit-background-clip:text;background-clip:text;color:transparent;flex:0 0 auto}
+.qcallout p{margin:0;color:var(--soft-ink);font-size:.94rem}
+.qcallout b{color:var(--ink)}
+
+/* stack review */
+.stack-list{display:flex;flex-direction:column;gap:.8rem;margin:1.6rem 0}
+.stack-row{display:grid;grid-template-columns:1.4fr 2fr auto;gap:1rem;align-items:center;padding:1rem 1.3rem}
+@media (max-width:760px){ .stack-row{grid-template-columns:1fr}}
+.stack-row .layer{font-weight:700;font-size:.92rem}
+.stack-row .choice{font-family:var(--font-mono);font-size:.8rem;color:var(--soft-ink)}
+.verdict{
+  font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;
+  padding:.3rem .65rem;border-radius:999px;white-space:nowrap;font-weight:600;
+}
+.verdict.keep{background:rgba(46,158,107,.14);color:var(--good)}
+.verdict.watch{background:rgba(255,138,76,.16);color:var(--coral)}
+.verdict.gap{background:rgba(224,86,63,.14);color:var(--bad)}
+.stack-detail{padding:0 1.3rem 1rem;margin-top:-.6rem;font-size:.88rem;color:var(--soft-ink)}
+.stack-detail b{color:var(--ink)}
+
+.verdict-box{padding:1.3rem 1.4rem;margin-top:1.4rem;border-left:3px solid transparent;border-image:var(--gradient) 1}
+.verdict-box h4{margin:0 0 .5rem;font-size:.95rem}
+.verdict-box p{margin:0;color:var(--soft-ink);font-size:.92rem}
+
+/* estimator */
+.palette{display:flex;flex-wrap:wrap;gap:.7rem;margin:1.4rem 0}
+.flow-card{
+  touch-action:none;cursor:grab;user-select:none;
+  display:flex;flex-direction:column;gap:.2rem;padding:.8rem 1rem;width:200px;
+  background:var(--glass-strong);border:1px solid var(--glass-border);border-radius:14px;box-shadow:var(--glass-shadow);
+}
+.flow-card:active{cursor:grabbing}
+.flow-card.used{opacity:.28;pointer-events:none}
+.flow-card .fname{font-weight:700;font-size:.85rem}
+.flow-card .fdesc{font-size:.72rem;color:var(--soft-ink);line-height:1.35}
+.flow-card .ftag{font-family:var(--font-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;color:var(--violet)}
+
+.ghost{
+  position:fixed;z-index:999;pointer-events:none;width:200px;
+  padding:.8rem 1rem;background:var(--glass-strong);border:1px solid var(--glass-border);
+  border-radius:14px;box-shadow:0 24px 50px -16px rgba(20,22,26,.4);transform:translate(-50%,-50%) rotate(-2deg);
+}
+.ghost .fname{font-weight:700;font-size:.85rem}
+
+.dropzone{
+  min-height:220px;padding:1.3rem;margin:0 0 1rem;
+  display:flex;flex-wrap:wrap;align-content:flex-start;gap:.8rem;
+  border:2px dashed var(--glass-border);border-radius:20px;background:var(--glass);
+  transition:border-color .15s, background .15s;
+}
+.dropzone.over{border-color:var(--violet);background:rgba(140,107,255,.08)}
+.dropzone .empty-msg{
+  width:100%;text-align:center;color:var(--faint-ink);font-size:.9rem;margin:auto;padding:2rem 0;
+}
+.result-card{
+  width:230px;padding:.85rem 1rem;background:var(--glass-strong);border:1px solid var(--glass-border);
+  border-radius:14px;box-shadow:var(--glass-shadow);position:relative;
+}
+.result-card .rm{
+  position:absolute;top:.5rem;right:.6rem;background:none;border:0;color:var(--faint-ink);cursor:pointer;
+  font-size:.9rem;line-height:1;padding:.2rem;
+}
+.result-card .rm:hover{color:var(--bad)}
+.result-card .fname{font-weight:700;font-size:.83rem;margin-bottom:.4rem;padding-right:1.2rem}
+.result-card .models{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem}
+.result-card .mchip{
+  font-family:var(--font-mono);font-size:.6rem;background:rgba(120,120,130,.1);border:1px solid var(--glass-border);
+  border-radius:999px;padding:.15rem .5rem;color:var(--soft-ink);
+}
+.result-card .cost{font-family:var(--font-mono);font-size:.82rem;font-weight:600;color:var(--good)}
+
+.totalbar{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  padding:1.1rem 1.4rem;
+}
+.totalbar .label{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--soft-ink)}
+.totalbar .amount{font-family:var(--font-display);font-size:1.8rem;font-weight:800;font-variant-numeric:tabular-nums}
+.totalbar .amount span{background:var(--gradient);-webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html"><span class="dot"></span><span class="full">Cost Per Generation</span></a>
+    <nav class="navlinks">
+      <a href="index.html">Research</a>
+      <a href="workflow.html" class="is-active">How it's built</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <span class="eyebrow">Companion brief — the build, end to end</span>
+    <h1>How it's built</h1>
+    <p class="lede">What the person on the other end of the prompt actually does, what a proposed engineering stack gets right and where it's thin, and a hands-on way to feel out what each feature would cost to run.</p>
+  </div>
+
+  <!-- WORKFLOW -->
+  <section style="margin-top:3rem" id="workflow">
+    <div class="wrap" style="max-width:740px">
+      <span class="eyebrow">01 — The user's workflow</span>
+      <h2>What does someone actually do to get a site out of this?</h2>
+    </div>
+    <div class="wrap">
+      <div class="steps">
+        <div class="step card">
+          <div class="sn">1</div>
+          <div>
+            <span class="badge">Input required: one sentence</span>
+            <h3>Describe it</h3>
+            <p>Chat, voice, or a screenshot upload — "artisan coffee roastery" is enough to start. Anything beyond that (a logo, hours, pricing, an existing brand voice) is optional and just makes the first draft closer to right; nothing is required upfront that isn't in the person's head already.</p>
+          </div>
+        </div>
+        <div class="step card">
+          <div class="sn">2</div>
+          <div>
+            <span class="badge">No input required</span>
+            <h3>Review the AI-drafted version</h3>
+            <p>A working page or app comes back in seconds — real content, not a wireframe. Anything treated as a factual claim (hours, prices, contact details) is flagged for confirmation rather than published silently.</p>
+          </div>
+        </div>
+        <div class="step card">
+          <div class="sn">3</div>
+          <div>
+            <span class="badge">Optional</span>
+            <h3>Refine, if it's not already right</h3>
+            <p>Ask for a change in chat ("make the hero bolder"), or click straight into the text and edit it by hand. Either path touches one section at a time — not a full regeneration.</p>
+          </div>
+        </div>
+        <div class="step card">
+          <div class="sn">4</div>
+          <div>
+            <span class="badge">One click</span>
+            <h3>Publish</h3>
+            <p>Domain, SSL, hosting, and a business email get provisioned automatically. The project stays open and editable — publishing isn't a finish line, it's a checkpoint.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap" style="max-width:740px">
+      <div class="qcallout card">
+        <span class="q">?</span>
+        <p><b>How much does someone actually need to type?</b> One sentence, minimum. Everything else the product would like to know — hours, pricing, a logo, a tone — is asked for as an optional add or a post-generation confirmation, never a blocking form. The whole pitch is zero setup.</p>
+      </div>
+    </div>
+
+    <div class="wrap" style="max-width:740px">
+      <h3 style="font-size:.95rem;margin:2rem 0 0">What actually gets delivered</h3>
+    </div>
+    <div class="wrap">
+      <div class="deliver-grid">
+        <div class="deliver card"><h3><span class="ic"></span>A real, functional site or app</h3><p>Not a static template — booking tools, dashboards, and quote calculators generate as working, database-backed features when the idea calls for one.</p></div>
+        <div class="deliver card"><h3><span class="ic"></span>Live infrastructure, not just files</h3><p>Domain, SSL certificate, hosting, and a business email address, auto-provisioned — nothing to configure separately.</p></div>
+        <div class="deliver card"><h3><span class="ic"></span>An editable project, not a finished object</h3><p>Every generated page stays open for chat-edits or direct hand-editing — the deliverable is a living project, not a one-time export.</p></div>
+        <div class="deliver card"><h3><span class="ic"></span>A visible cost, not a mystery bill</h3><p>Credits tracked against the plan tier as they're spent — the thing Lovable's users say they don't get.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- STACK REVIEW -->
+  <section id="stack">
+    <div class="wrap" style="max-width:740px">
+      <span class="eyebrow">02 — Engineering stack review</span>
+      <h2>A developer's proposed stack — is it right?</h2>
+      <p class="lede">Reviewed layer by layer. Short answer: the core is solid and worth keeping — two things are worth pushing on before it's final.</p>
+    </div>
+    <div class="wrap">
+      <div class="stack-list">
+        <div class="card">
+          <div class="stack-row">
+            <span class="layer">Frontend</span>
+            <span class="choice">Next.js (App Router) + shadcn/ui + TypeScript</span>
+            <span class="verdict keep">Keep</span>
+          </div>
+          <div class="stack-detail">Standard, well-supported, fast to build in. Server actions cut boilerplate; shadcn ships accessible components you own (copy-in, not a runtime dependency) instead of a locked-in design system. Right call for a small team moving fast.</div>
+        </div>
+        <div class="card">
+          <div class="stack-row">
+            <span class="layer">Database + Auth</span>
+            <span class="choice">Supabase — Postgres, Auth, RLS for role/portal isolation</span>
+            <span class="verdict keep">Keep</span>
+          </div>
+          <div class="stack-detail">Enforcing internal/customer/operator isolation at the database layer via RLS is stronger than checking roles only in application code. <b>One caution:</b> RLS policies get harder to reason about as they multiply — keep them simple, test them directly, and don't treat RLS as the only line of defense; validate roles in server actions too.</div>
+        </div>
+        <div class="card">
+          <div class="stack-row">
+            <span class="layer">CRUD</span>
+            <span class="choice">Direct against Supabase — client + server actions/route handlers, no separate API layer</span>
+            <span class="verdict keep">Keep, with a caveat</span>
+          </div>
+          <div class="stack-detail">Right-sized for now — a hand-rolled REST/GraphQL layer in front of the database would just be a proxy nobody needed yet. <b>The caveat:</b> this quietly assumes only this Next.js app ever talks to the data. If a mobile app, a partner integration, or a public API shows up later, that's a real retrofit, not a config change — worth deciding now whether that's a permanent bet or a Phase-0 simplification.</div>
+        </div>
+        <div class="card">
+          <div class="stack-row">
+            <span class="layer">Background jobs</span>
+            <span class="choice">Separate Dockerized Python server, same Postgres — polling, expiry sweeps, timers</span>
+            <span class="verdict watch">Push back</span>
+          </div>
+          <div class="stack-detail">Pulling long-running/scheduled work out of the request-response cycle is the right instinct — serverless functions aren't built for polling loops. <b>But:</b> a second language and a second deploy pipeline is a real tax on a small team already running TypeScript everywhere else. Worth asking directly: is there a concrete reason for Python here (a library only Python has, existing team depth), or is it default habit? If it's habit, a Node/TypeScript worker — or a managed queue like Supabase's pg_cron, Trigger.dev, or Inngest — gets the same separation without a second runtime to operate.</div>
+        </div>
+        <div class="card">
+          <div class="stack-row">
+            <span class="layer">Realtime</span>
+            <span class="choice">Supabase Realtime — dashboards, notifications</span>
+            <span class="verdict keep">Keep</span>
+          </div>
+          <div class="stack-detail">Already on Postgres, so this rides the existing infrastructure instead of standing up a separate pub/sub or websocket service. Minimal-additional-infra is the right bias at this stage.</div>
+        </div>
+        <div class="card">
+          <div class="stack-row">
+            <span class="layer">AI / LLM orchestration</span>
+            <span class="choice">— not specified —</span>
+            <span class="verdict gap">Missing</span>
+          </div>
+          <div class="stack-detail">This is the actual product. Nowhere in the stack does it say where model calls happen, how a multi-step generation (plan → fill, per the architecture above) gets queued and retried, or how streaming output reaches the UI. That decision — inside a Next.js server action for simple calls, versus a dedicated service for longer agent loops — belongs in this stack description before anything else does.</div>
+        </div>
+      </div>
+
+      <div class="verdict-box card">
+        <h4>Overall call</h4>
+        <p>Keep the core: Next.js/shadcn/TypeScript, Supabase for Postgres/Auth/RLS, no separate CRUD layer yet, Realtime on Supabase. Two things to resolve before it's final — confirm Python earns its place for background jobs rather than defaulting to it, and name where AI orchestration actually lives. That second one isn't a nice-to-have; for this product, it's the part of the stack that matters most.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ESTIMATOR -->
+  <section id="estimator">
+    <div class="wrap" style="max-width:740px">
+      <span class="eyebrow">03 — Try it yourself</span>
+      <h2>Build a flow, watch the cost add up</h2>
+      <p class="lede">Drag feature cards into the box below. Each one reveals the cheapest reasonable model for that step and its estimated cost per generation — assumed token counts, illustrative only, same spirit as the <a href="index.html">research brief</a>.</p>
+    </div>
+    <div class="wrap">
+      <div class="palette" id="palette"></div>
+
+      <div class="dropzone" id="dropzone">
+        <span class="empty-msg" id="emptyMsg">Drag a card here to add it to the flow</span>
+      </div>
+
+      <div class="totalbar card">
+        <span class="label">Estimated cost per generation, this flow</span>
+        <span class="amount"><span id="totalAmount">$0.0000</span></span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <p>Figures use the cheapest reasonable candidate per step from the <a href="index.html">Cost Per Generation</a> model table, times an assumed token count for a typical call — not a measured average. Useful for feeling out relative weight between features, not for a real budget line.</p>
+    </div>
+  </footer>
+</main>
+
+<script>
+(function(){
+  var FEATURES = [
+    { id:'parse', name:'Brief parsing & routing', desc:'Classify the input into a category/template.', tag:'classification', models:['Command R7B','GPT-5 Nano'], cost:0.000038 },
+    { id:'plan', name:'Layout / plan drafting', desc:'Decide sections, order, what each one says.', tag:'reasoning', models:['Gemini 3 Flash','Claude Sonnet 5'], cost:0.003150 },
+    { id:'copy', name:'Section copy drafting', desc:'Write the copy for one section. Runs per section.', tag:'writing', models:['Claude Haiku 4.5','GPT-5 Mini'], cost:0.002800 },
+    { id:'code', name:'Code / component generation', desc:'Booking tools, dashboards — real app features.', tag:'coding', models:['Kimi K2.7 Code','Qwen3 Coder'], cost:0.010970 },
+    { id:'edit', name:'Chat-based edit request', desc:'A targeted diff from a conversational ask.', tag:'editing', models:['Claude Haiku 4.5','Grok 4.1'], cost:0.002500 },
+    { id:'vision', name:'Screenshot / image understanding', desc:'Turn an uploaded reference into a spec.', tag:'multimodal', models:['Gemini 3.1 Pro','GPT-5.5'], cost:0.007200 },
+    { id:'flag', name:'Factual-claim flagging', desc:'Catch hours, prices, contacts before publish.', tag:'safety check', models:['Command R7B','GPT-5 Nano'], cost:0.000023 }
+  ];
+
+  var palette = document.getElementById('palette');
+  var dropzone = document.getElementById('dropzone');
+  var emptyMsg = document.getElementById('emptyMsg');
+  var totalAmount = document.getElementById('totalAmount');
+  var total = 0;
+
+  function fmt(n){
+    if(n === 0) return '$0.0000';
+    if(n < 0.001) return '$' + n.toFixed(6);
+    if(n < 0.01) return '$' + n.toFixed(5);
+    return '$' + n.toFixed(4);
+  }
+
+  FEATURES.forEach(function(f){
+    var card = document.createElement('div');
+    card.className = 'flow-card';
+    card.id = 'card-' + f.id;
+    card.innerHTML = '<span class="ftag">' + f.tag + '</span><span class="fname">' + f.name + '</span><span class="fdesc">' + f.desc + '</span>';
+    palette.appendChild(card);
+    wireDrag(card, f);
+  });
+
+  function wireDrag(card, f){
+    card.addEventListener('pointerdown', function(e){
+      if(card.classList.contains('used')) return;
+      e.preventDefault();
+      var ghost = document.createElement('div');
+      ghost.className = 'ghost';
+      ghost.innerHTML = '<span class="fname">' + f.name + '</span>';
+      document.body.appendChild(ghost);
+      moveGhost(e.clientX, e.clientY);
+
+      function moveGhost(x,y){ ghost.style.left = x + 'px'; ghost.style.top = y + 'px'; }
+
+      function onMove(ev){
+        moveGhost(ev.clientX, ev.clientY);
+        var r = dropzone.getBoundingClientRect();
+        var inside = ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom;
+        dropzone.classList.toggle('over', inside);
+      }
+      function onUp(ev){
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        dropzone.classList.remove('over');
+        var r = dropzone.getBoundingClientRect();
+        var inside = ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom;
+        ghost.remove();
+        if(inside) addToFlow(f, card);
+      }
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+    });
+  }
+
+  function addToFlow(f, card){
+    card.classList.add('used');
+    emptyMsg.style.display = 'none';
+
+    var rc = document.createElement('div');
+    rc.className = 'result-card';
+    rc.id = 'result-' + f.id;
+    rc.innerHTML =
+      '<button class="rm" aria-label="Remove ' + f.name + '">×</button>' +
+      '<div class="fname">' + f.name + '</div>' +
+      '<div class="models">' + f.models.map(function(m){ return '<span class="mchip">' + m + '</span>'; }).join('') + '</div>' +
+      '<div class="cost">' + fmt(f.cost) + ' / call</div>';
+    dropzone.appendChild(rc);
+
+    total += f.cost;
+    totalAmount.textContent = fmt(total);
+
+    rc.querySelector('.rm').addEventListener('click', function(){
+      rc.remove();
+      card.classList.remove('used');
+      total -= f.cost;
+      totalAmount.textContent = fmt(total);
+      if(!dropzone.querySelector('.result-card')) emptyMsg.style.display = '';
+    });
+  }
+})();
+</script>
+</body>
+</html>

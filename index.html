@@ -7,164 +7,64 @@
 <meta name="description" content="A research brief on Lovable's weaknesses to leverage, token-economics tactics, and a full LLM comparison — prepared for IONOS AI App & Sitebuilder prep. No model picked yet." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
 <style>
-:root{
-  --bg:#EEF0EA;
-  --surface:#FFFFFF;
-  --surface-2:#F5F3EE;
-  --ink:#1B1F1A;
-  --soft-ink:#565F55;
-  --hairline:#D6D9CE;
-  --accent:#A9762E;
-  --on-accent:#3A2404;
-  --good:#4B7A4A;
-  --bad:#A64B33;
-  --font-display:'Newsreader', Georgia, serif;
-  --font-body:'IBM Plex Sans', system-ui, sans-serif;
-  --font-mono:'IBM Plex Mono', ui-monospace, monospace;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#14160F; --surface:#1C1F17; --surface-2:#22261B;
-    --ink:#ECEFE6; --soft-ink:#AFB8A8; --hairline:#34392B;
-    --accent:#D6A54E; --on-accent:#2A1B02; --good:#6FA36B; --bad:#C97457;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#14160F; --surface:#1C1F17; --surface-2:#22261B;
-  --ink:#ECEFE6; --soft-ink:#AFB8A8; --hairline:#34392B;
-  --accent:#D6A54E; --on-accent:#2A1B02; --good:#6FA36B; --bad:#C97457;
-}
-
-*,*::before,*::after{box-sizing:border-box}
-body{
-  margin:0; background:var(--bg); color:var(--ink);
-  font-family:var(--font-body); font-size:16px; line-height:1.6;
-  padding:0 20px; -webkit-font-smoothing:antialiased;
-}
-@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-a{color:var(--accent)}
-
-.wrap{max-width:740px;margin:0 auto}
-.wide{max-width:1180px;margin:0 auto}
-main{padding-block:3rem 5rem}
-
-h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.15;margin:0 0 .4em;text-wrap:balance}
-h1{font-size:clamp(2rem,5vw,2.7rem);letter-spacing:-.01em}
-h2{font-size:clamp(1.4rem,3vw,1.85rem);margin-top:0}
-h3{font-size:1.15rem}
-em{font-style:italic}
-p{margin:0 0 1rem;max-width:66ch}
-.lede{color:var(--soft-ink);font-size:1.05rem;max-width:62ch}
-
-.eyebrow{
-  font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;
-  letter-spacing:.14em;color:var(--accent);font-weight:500;margin:0 0 .9rem;display:block;
-}
-.meta{
-  font-family:var(--font-mono);font-size:.74rem;color:var(--soft-ink);
-  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
-  padding-block:.7rem;margin:1.4rem 0 0;display:flex;gap:1.5rem;flex-wrap:wrap;
-}
-.meta b{color:var(--ink);font-weight:500}
-
-.rule{height:1px;background:var(--hairline);border:0;max-width:1180px;margin:3.2rem auto}
-section{max-width:1180px;margin:0 auto}
-.section-inner{max-width:740px}
-.wide-inner{max-width:1180px}
-
-.note{
-  font-family:var(--font-mono);font-size:.78rem;color:var(--soft-ink);
-  background:var(--surface-2);border:1px solid var(--hairline);border-radius:6px;
-  padding:.75rem .9rem;margin:1rem 0 1.6rem;max-width:66ch;
-}
-.note b{color:var(--ink)}
-
 /* strengths/weaknesses */
-.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin:1.6rem 0}
+.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin:1.6rem 0}
 @media (max-width:640px){ .sw-grid{grid-template-columns:1fr} }
-.sw{background:var(--surface);border:1px solid var(--hairline);border-radius:8px;padding:1.2rem 1.3rem}
-.sw h3{font-size:.72rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.9rem}
+.sw{padding:1.3rem 1.4rem}
+.sw h3{font-size:.7rem;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.9rem;font-weight:600}
 .sw.strength h3{color:var(--good)}
 .sw.weakness h3{color:var(--bad)}
 .sw ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.7rem}
-.sw li{font-size:.93rem;color:var(--ink);padding-left:1rem;position:relative}
-.sw.strength li::before{content:"+";position:absolute;left:0;color:var(--good);font-family:var(--font-mono);font-weight:600}
-.sw.weakness li::before{content:"–";position:absolute;left:0;color:var(--bad);font-family:var(--font-mono);font-weight:600}
+.sw li{font-size:.93rem;color:var(--ink);padding-left:1.1rem;position:relative}
+.sw.strength li::before{content:"+";position:absolute;left:0;color:var(--good);font-family:var(--font-mono);font-weight:700}
+.sw.weakness li::before{content:"–";position:absolute;left:0;color:var(--bad);font-family:var(--font-mono);font-weight:700}
 
 .leverage{display:flex;flex-direction:column;gap:1rem;margin:1.6rem 0}
-.lev{display:flex;gap:1rem;padding:1.1rem 1.2rem;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--accent)}
-.lev .num{font-family:var(--font-mono);font-size:.85rem;color:var(--accent);font-weight:600;flex:0 0 auto}
-.lev h4{margin:0 0 .3rem;font-size:1rem;font-weight:600}
+.lev{display:flex;gap:1rem;padding:1.15rem 1.3rem;border-left:3px solid transparent;border-image:var(--gradient) 1}
+.lev .num{font-family:var(--font-mono);font-size:.85rem;background:var(--gradient);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700;flex:0 0 auto}
+.lev h4{margin:0 0 .3rem;font-size:1rem;font-weight:700}
 .lev p{margin:0;font-size:.92rem;color:var(--soft-ink)}
-.lev .weak-tag{font-family:var(--font-mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--bad);display:block;margin-bottom:.3rem}
+.lev .weak-tag{font-family:var(--font-mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--coral);display:block;margin-bottom:.3rem}
 
-/* levers */
-.levers{display:flex;flex-direction:column;gap:0;border:1px solid var(--hairline);border-radius:8px;overflow:hidden;margin:1.6rem 0}
-.lever-row{display:grid;grid-template-columns:2.4rem 1fr auto;gap:1rem;align-items:start;padding:1rem 1.2rem;border-bottom:1px solid var(--hairline);background:var(--surface)}
-.lever-row:last-child{border-bottom:0}
-.lever-row .n{font-family:var(--font-display);font-size:1.4rem;color:var(--accent);font-weight:600}
-.lever-row h4{margin:0 0 .3rem;font-size:.98rem}
+.levers{display:flex;flex-direction:column;gap:.8rem;margin:1.6rem 0}
+.lever-row{display:grid;grid-template-columns:2.4rem 1fr auto;gap:1rem;align-items:start;padding:1.1rem 1.3rem}
+.lever-row .n{font-family:var(--font-display);font-size:1.5rem;background:var(--gradient);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.lever-row h4{margin:0 0 .3rem;font-size:.98rem;font-weight:700}
 .lever-row p{margin:0;font-size:.9rem;color:var(--soft-ink);max-width:56ch}
-.lever-row .save{
-  font-family:var(--font-mono);font-size:.78rem;color:var(--good);
-  white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;
-}
+.lever-row .save{font-family:var(--font-mono);font-size:.76rem;color:var(--good);white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right}
 @media (max-width:560px){ .lever-row{grid-template-columns:2rem 1fr}.lever-row .save{grid-column:2;text-align:left} }
 
-/* filter chips */
 .filters{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.4rem 0 1rem}
-.chip{
-  font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;
-  background:var(--surface);border:1px solid var(--hairline);color:var(--soft-ink);
-  border-radius:999px;padding:.4rem .8rem;cursor:pointer;transition:.15s;
-}
-.chip:hover{border-color:var(--accent)}
-.chip.active{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 
-.table-wrap{overflow-x:auto;border:1px solid var(--hairline);border-radius:8px;margin-bottom:1.6rem}
-table{border-collapse:collapse;width:100%;min-width:820px;font-size:.86rem}
-th,td{text-align:left;padding:.65rem .85rem;vertical-align:top;border-bottom:1px solid var(--hairline)}
-thead th{
-  font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;
-  color:var(--soft-ink);background:var(--surface-2);white-space:nowrap;
-}
-tbody tr{background:var(--surface)}
-tbody tr.hide{display:none}
-tbody tr:last-child td{border-bottom:0}
-td.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
-td.model{font-weight:600}
-td.provider{color:var(--soft-ink);white-space:nowrap}
-.tier-row td{background:var(--surface-2);font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:600;padding:.5rem .85rem}
-.tag{
-  display:inline-block;font-family:var(--font-mono);font-size:.62rem;text-transform:uppercase;
-  letter-spacing:.05em;padding:.15rem .4rem;border-radius:4px;margin:0 .2rem .2rem 0;
-  background:var(--surface-2);color:var(--soft-ink);border:1px solid var(--hairline);
-}
-.flag{color:var(--bad);font-family:var(--font-mono)}
-
-/* feature map */
 .fm-note{
   display:inline-block;font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;
-  letter-spacing:.08em;color:var(--accent);border:1px solid var(--accent);border-radius:5px;
-  padding:.3rem .6rem;margin-bottom:1.2rem;
+  letter-spacing:.08em;color:#fff;background:var(--gradient);border-radius:999px;
+  padding:.35rem .7rem;margin-bottom:1.2rem;
 }
 .fmtable td.candidates{color:var(--soft-ink);font-size:.85rem}
-.fmtable td.candidates b{color:var(--ink);font-weight:600}
+.fmtable td.candidates b{color:var(--ink);font-weight:700}
 
-footer{
-  border-top:1px solid var(--hairline);margin-top:1rem;padding-block:2.4rem 3rem;
+.meta{
+  font-family:var(--font-mono);font-size:.74rem;color:var(--soft-ink);
+  border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);
+  padding-block:.7rem;margin:1.4rem 0 0;display:flex;gap:1.5rem;flex-wrap:wrap;
 }
-footer .wrap{font-size:.82rem;color:var(--soft-ink)}
-footer h4{font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--soft-ink);margin:0 0 .6rem}
-footer ol{margin:0 0 1.4rem;padding-left:1.2rem}
-footer li{margin-bottom:.3rem}
-footer a{color:var(--soft-ink);text-decoration:underline}
+.meta b{color:var(--ink);font-weight:600}
 </style>
 </head>
 <body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html"><span class="dot"></span><span class="full">Cost Per Generation</span></a>
+    <nav class="navlinks">
+      <a href="index.html" class="is-active">Research</a>
+      <a href="workflow.html">How it's built</a>
+    </nav>
+  </div>
+</header>
 
 <main>
   <div class="wrap">
@@ -179,15 +79,15 @@ footer a{color:var(--soft-ink);text-decoration:underline}
   </div>
 
   <!-- LOVABLE -->
-  <section>
-    <div class="wrap section-inner">
+  <section style="margin-top:3rem">
+    <div class="wrap" style="max-width:740px">
       <span class="eyebrow">01 — Competitor read</span>
       <h2>Lovable: where it's strong, where it opens a door</h2>
       <p class="lede">Lovable is the closest thing to a category leader in AI app generation right now. It's not weak — it's optimized for a specific 80%, and it says so implicitly by pushing power users elsewhere for the last 20%.</p>
     </div>
-    <div class="wide-inner">
+    <div class="wrap">
       <div class="sw-grid">
-        <div class="sw strength">
+        <div class="sw card strength">
           <h3>Strengths</h3>
           <ul>
             <li>Fastest path from idea to a clickable prototype — hours, sometimes minutes</li>
@@ -196,7 +96,7 @@ footer a{color:var(--soft-ink);text-decoration:underline}
             <li>One flow from generation to live deployment, no separate publish step</li>
           </ul>
         </div>
-        <div class="sw weakness">
+        <div class="sw card weakness">
           <h3>Weaknesses</h3>
           <ul>
             <li>Falls apart on original UI, custom API integrations, and complex backend logic — the "last 20%" pushes serious users out to Cursor or Claude Code</li>
@@ -208,10 +108,12 @@ footer a{color:var(--soft-ink);text-decoration:underline}
       </div>
     </div>
 
-    <div class="wrap section-inner">
+    <div class="wrap" style="max-width:740px">
       <h3 style="font-family:var(--font-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink);margin-top:2rem">Leverage points — ranked by how directly they turn a weakness into a feature</h3>
+    </div>
+    <div class="wrap">
       <div class="leverage">
-        <div class="lev">
+        <div class="lev card">
           <span class="num">01</span>
           <div>
             <span class="weak-tag">Targets: credit opacity</span>
@@ -219,7 +121,7 @@ footer a{color:var(--soft-ink);text-decoration:underline}
             <p>Lovable's most repeated complaint is not knowing what a credit bought. A live, pre-commit estimate — "this edit will cost ~2 credits" before the user clicks generate, not a balance that just goes down — turns the JD's "token economics as a core product parameter" into a visible trust feature, not just a backend cost model.</p>
           </div>
         </div>
-        <div class="lev">
+        <div class="lev card">
           <span class="num">02</span>
           <div>
             <span class="weak-tag">Targets: the last-20% cliff</span>
@@ -227,7 +129,7 @@ footer a{color:var(--soft-ink);text-decoration:underline}
             <p>Lovable is explicitly strongest at 0→80%, then hands users off to a real IDE. IONOS doesn't need to win the "complex custom logic" fight — it needs the 80→100% stretch to be survivable inside the product: a clean code export, or a documented handoff path to a developer, rather than pretending the AI can finish everything.</p>
           </div>
         </div>
-        <div class="lev">
+        <div class="lev card">
           <span class="num">03</span>
           <div>
             <span class="weak-tag">Targets: reliability under load</span>
@@ -235,7 +137,7 @@ footer a{color:var(--soft-ink);text-decoration:underline}
             <p>IONOS's core business is hosting and uptime — the exact muscle needed to fix "it freezes mid-generation." A builder that leans on "99.99% uptime" messaging only earns that claim if the builder itself doesn't stall. This is a genuine structural advantage over an AI-first startup with no infrastructure legacy.</p>
           </div>
         </div>
-        <div class="lev">
+        <div class="lev card">
           <span class="num">04</span>
           <div>
             <span class="weak-tag">Targets: hard complexity limits</span>
@@ -251,34 +153,34 @@ footer a{color:var(--soft-ink);text-decoration:underline}
 
   <!-- TOKEN ECONOMICS -->
   <section>
-    <div class="wrap section-inner">
+    <div class="wrap" style="max-width:740px">
       <span class="eyebrow">02 — Token economics</span>
       <h2>Five levers, in the order they pay for themselves</h2>
       <p class="lede">Case studies stacking all five report 60–90% cost reduction with no measured quality loss. This isn't "use a cheaper model" — it's an engineering discipline with its own tooling market.</p>
     </div>
-    <div class="wide-inner">
+    <div class="wrap">
       <div class="levers">
-        <div class="lever-row">
+        <div class="lever-row card">
           <span class="n">1</span>
           <div><h4>Prompt caching</h4><p>Cache the stable parts of a prompt — system instructions, the brand/style guide, the page's existing structure — so a small edit only bills for what actually changed.</p></div>
           <span class="save">~90% off cached input (Anthropic) · ~50% (OpenAI)</span>
         </div>
-        <div class="lever-row">
+        <div class="lever-row card">
           <span class="n">2</span>
           <div><h4>Model routing / cascading</h4><p>Try a cheap, fast model first for routine work; escalate to a frontier model only when the task actually needs it. A common split is roughly 70% cheap / 20% mid / 10% frontier.</p></div>
           <span class="save">60–80% cost reduction</span>
         </div>
-        <div class="lever-row">
+        <div class="lever-row card">
           <span class="n">3</span>
           <div><h4>Context engineering</h4><p>Every token sent is billed, including the ones that don't help. Summarize prior state instead of replaying full history; don't resend the whole page for a one-line copy edit.</p></div>
           <span class="save">40–60% of typical agent spend is low-value context</span>
         </div>
-        <div class="lever-row">
+        <div class="lever-row card">
           <span class="n">4</span>
           <div><h4>Output length control</h4><p>Ask for a patch, not a rewrite — structured diffs or JSON instead of "regenerate the whole file." Output tokens cost several times more than input tokens on nearly every provider, so this lever moves cost disproportionately.</p></div>
           <span class="save">output tokens ≈ 4–8× input price, most providers</span>
         </div>
-        <div class="lever-row">
+        <div class="lever-row card">
           <span class="n">5</span>
           <div><h4>Monitoring &amp; attribution</h4><p>Track cost per generation type so credit pricing can be set honestly — the direct fix for Lovable's "I can't predict my bill" complaint. Tooling lanes: AI gateways (Portkey, Helicone, LiteLLM), auto-routers (OpenRouter, Not Diamond), and observability/semantic caching (Langfuse, GPTCache).</p></div>
           <span class="save">makes the other four measurable</span>
@@ -291,12 +193,12 @@ footer a{color:var(--soft-ink);text-decoration:underline}
 
   <!-- LLM LANDSCAPE -->
   <section>
-    <div class="wrap section-inner">
+    <div class="wrap" style="max-width:740px">
       <span class="eyebrow">03 — The full model landscape</span>
       <h2>Every candidate worth knowing about</h2>
       <p class="lede">Grouped by tier, not by preference. Filter by tag to narrow the list — nothing here is pre-selected.</p>
     </div>
-    <div class="wide-inner">
+    <div class="wrap">
       <div class="note"><b>On these numbers:</b> pulled from third-party rate-tracking sites in September 2026, not each provider's own pricing page — a few figures conflicted across sources and are marked <span class="flag">†</span> with "confirm" in the notes. Treat as directional for comparison, verify before committing real budget math. Open-weight models don't have one fixed price — cost depends on which inference host runs them, or your own GPU cost if self-hosted.</div>
 
       <div class="filters" id="filters">
@@ -363,13 +265,13 @@ footer a{color:var(--soft-ink);text-decoration:underline}
 
   <!-- FEATURE MAP -->
   <section>
-    <div class="wrap section-inner">
+    <div class="wrap" style="max-width:740px">
       <span class="eyebrow">04 — Where each model could actually fit</span>
       <h2>Candidates per feature, not a decision</h2>
       <span class="fm-note">Shortlist only — pick nothing yet</span>
-      <p class="lede">If the builder runs on a plan-then-fill architecture, each step has different requirements — no reason to pay frontier prices for a step a $0.05-input model can handle.</p>
+      <p class="lede">If the builder runs on a plan-then-fill architecture, each step has different requirements — no reason to pay frontier prices for a step a $0.05-input model can handle. Want to feel this out yourself? <a href="workflow.html#estimator">Try the drag-and-drop cost estimator →</a></p>
     </div>
-    <div class="wide-inner">
+    <div class="wrap">
       <div class="table-wrap">
         <table class="fmtable">
           <thead><tr><th>Feature / step</th><th>What it actually needs</th><th>Candidates, cheap → frontier</th></tr></thead>
